@@ -1,0 +1,71 @@
+package com.nhom5.backend.controller;
+
+import com.nhom5.backend.model.InterviewBooking;
+import com.nhom5.backend.service.InterviewBookingService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/interview-bookings")
+@CrossOrigin(origins = "*")
+public class InterviewBookingController {
+
+    @Autowired
+    private InterviewBookingService interviewBookingService;
+
+    @GetMapping
+    public List<InterviewBooking> getAll() {
+        return interviewBookingService.getAllInterviewBookings();
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<InterviewBooking> getByUserId(@PathVariable Long userId) {
+        return interviewBookingService.getByUserId(userId);
+    }
+
+    @GetMapping("/enterprise/{enterpriseId}")
+    public List<InterviewBooking> getByEnterpriseId(@PathVariable Long enterpriseId) {
+        return interviewBookingService.getByEnterpriseId(enterpriseId);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<InterviewBooking> getById(@PathVariable Long id) {
+        return interviewBookingService.getInterviewBookingById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public InterviewBooking create(@RequestBody InterviewBooking ib) {
+        return interviewBookingService.createInterviewBooking(ib);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<InterviewBooking> update(@PathVariable Long id, @RequestBody InterviewBooking ib) {
+        return interviewBookingService.updateInterviewBooking(id, ib)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<InterviewBooking> patch(@PathVariable Long id, @RequestBody InterviewBooking patch) {
+        return interviewBookingService.getInterviewBookingById(id).map(existing -> {
+            if (patch.getStatus() != null) existing.setStatus(patch.getStatus());
+            if (patch.getCancelReason() != null) existing.setCancelReason(patch.getCancelReason());
+            if (patch.getMeetingLink() != null) existing.setMeetingLink(patch.getMeetingLink());
+            if (patch.getUpdateStatusTime() != null) existing.setUpdateStatusTime(patch.getUpdateStatusTime());
+            return ResponseEntity.ok(interviewBookingService.createInterviewBooking(existing));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        if (interviewBookingService.deleteInterviewBooking(id)) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+}
