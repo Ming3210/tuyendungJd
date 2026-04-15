@@ -4,6 +4,8 @@ import com.nhom5.backend.model.CertificateType;
 import com.nhom5.backend.repository.CertificateTypeRepository;
 import com.nhom5.backend.service.CertificateTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,11 @@ public class CertificateTypeServiceImpl implements CertificateTypeService {
     @Override
     public List<CertificateType> getAllCertificateTypes() {
         return certificateTypeRepository.findAll();
+    }
+
+    @Override
+    public Page<CertificateType> getCertificateTypesPaginated(Pageable pageable) {
+        return certificateTypeRepository.findAll(pageable);
     }
 
     @Override

@@ -1,8 +1,11 @@
 package com.nhom5.backend.model;
 
+import com.nhom5.backend.converter.JsonListConverter;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
+
 
 @Entity
 @Table(name = "jobs")
@@ -16,12 +19,13 @@ public class Job {
     private String title;
     private Integer quantity;
 
-    // Stored as JSON string, e.g. ["item1","item2"]
     @Column(columnDefinition = "TEXT")
-    private String description;
+    @Convert(converter = JsonListConverter.class)
+    private List<String> description;
 
     @Column(name = "`rank`", columnDefinition = "TEXT")
-    private String rank;
+    @Convert(converter = JsonListConverter.class)
+    private List<String> rank;
 
     private String gender;
     private String skills;
@@ -36,13 +40,15 @@ public class Job {
     private String address;
 
     @Column(columnDefinition = "TEXT")
-    private String benefitsDescription;
+    @Convert(converter = JsonListConverter.class)
+    private List<String> benefitsDescription;
 
     private String workingTime;
     private String deadline;
 
     @Column(columnDefinition = "TEXT")
-    private String required;
+    @Convert(converter = JsonListConverter.class)
+    private List<String> required;
 
     private String industry;
     private String enterpriseId;

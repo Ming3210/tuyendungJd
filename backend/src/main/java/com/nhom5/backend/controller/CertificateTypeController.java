@@ -3,6 +3,10 @@ package com.nhom5.backend.controller;
 import com.nhom5.backend.model.CertificateType;
 import com.nhom5.backend.service.CertificateTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +21,18 @@ public class CertificateTypeController {
     private CertificateTypeService certificateTypeService;
 
     @GetMapping
-    public List<CertificateType> getAll() {
-        return certificateTypeService.getAllCertificateTypes();
+    public ResponseEntity<List<CertificateType>> getAll(
+            @RequestParam(name = "_page", defaultValue = "1") int page,
+            @RequestParam(name = "_limit", defaultValue = "6") int limit) {
+        
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        Page<CertificateType> ctPage = certificateTypeService.getCertificateTypesPaginated(pageable);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("x-total-count", String.valueOf(ctPage.getTotalElements()));
+        headers.add("Access-Control-Expose-Headers", "x-total-count");
+
+        return ResponseEntity.ok().headers(headers).body(ctPage.getContent());
     }
 
     @GetMapping("/{id}")

@@ -3,6 +3,10 @@ package com.nhom5.backend.controller;
 import com.nhom5.backend.model.Enterprise;
 import com.nhom5.backend.service.EnterpriseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +21,18 @@ public class EnterpriseController {
     private EnterpriseService enterpriseService;
 
     @GetMapping
-    public List<Enterprise> getAll() {
-        return enterpriseService.getAllEnterprises();
+    public ResponseEntity<List<Enterprise>> getAll(
+            @RequestParam(name = "_page", defaultValue = "1") int page,
+            @RequestParam(name = "_limit", defaultValue = "6") int limit) {
+        
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        Page<Enterprise> enterprisePage = enterpriseService.getEnterprisesPaginated(pageable);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("x-total-count", String.valueOf(enterprisePage.getTotalElements()));
+        headers.add("Access-Control-Expose-Headers", "x-total-count");
+
+        return ResponseEntity.ok().headers(headers).body(enterprisePage.getContent());
     }
 
     @GetMapping("/{id}")
@@ -26,6 +40,11 @@ public class EnterpriseController {
         return enterpriseService.getEnterpriseById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<Enterprise> getByUserId(@PathVariable Long userId) {
+        return enterpriseService.getEnterprisesByUserId(userId);
     }
 
     @PostMapping

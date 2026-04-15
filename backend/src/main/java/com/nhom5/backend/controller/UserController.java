@@ -3,6 +3,10 @@ package com.nhom5.backend.controller;
 import com.nhom5.backend.model.User;
 import com.nhom5.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +21,20 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<List<User>> getAllUsers(
+            @RequestParam(name = "_page", defaultValue = "1") int page,
+            @RequestParam(name = "_limit", defaultValue = "6") int limit,
+            @RequestParam(name = "role", required = false) String role,
+            @RequestParam(name = "q", required = false) String q) {
+
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        Page<User> userPage = userService.getUsersPaginated(role, q, pageable);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("x-total-count", String.valueOf(userPage.getTotalElements()));
+        headers.add("Access-Control-Expose-Headers", "x-total-count");
+
+        return ResponseEntity.ok().headers(headers).body(userPage.getContent());
     }
 
     @GetMapping("/{id}")

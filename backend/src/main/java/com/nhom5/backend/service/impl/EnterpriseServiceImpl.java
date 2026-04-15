@@ -4,6 +4,8 @@ import com.nhom5.backend.model.Enterprise;
 import com.nhom5.backend.repository.EnterpriseRepository;
 import com.nhom5.backend.service.EnterpriseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,11 @@ public class EnterpriseServiceImpl implements EnterpriseService {
     @Override
     public List<Enterprise> getAllEnterprises() {
         return enterpriseRepository.findAll();
+    }
+
+    @Override
+    public Page<Enterprise> getEnterprisesPaginated(Pageable pageable) {
+        return enterpriseRepository.findAll(pageable);
     }
 
     @Override
@@ -50,6 +57,11 @@ public class EnterpriseServiceImpl implements EnterpriseService {
             e.setStatus(details.getStatus());
             return enterpriseRepository.save(e);
         });
+    }
+
+    @Override
+    public List<Enterprise> getEnterprisesByUserId(Long userId) {
+        return enterpriseRepository.findByUserId(userId);
     }
 
     @Override

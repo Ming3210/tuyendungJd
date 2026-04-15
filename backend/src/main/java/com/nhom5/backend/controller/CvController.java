@@ -3,6 +3,10 @@ package com.nhom5.backend.controller;
 import com.nhom5.backend.model.Cv;
 import com.nhom5.backend.service.CvService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +21,18 @@ public class CvController {
     private CvService cvService;
 
     @GetMapping
-    public List<Cv> getAll() {
-        return cvService.getAllCvs();
+    public ResponseEntity<List<Cv>> getAll(
+            @RequestParam(name = "_page", defaultValue = "1") int page,
+            @RequestParam(name = "_limit", defaultValue = "6") int limit) {
+        
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        Page<Cv> cvPage = cvService.getCvsPaginated(pageable);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("x-total-count", String.valueOf(cvPage.getTotalElements()));
+        headers.add("Access-Control-Expose-Headers", "x-total-count");
+
+        return ResponseEntity.ok().headers(headers).body(cvPage.getContent());
     }
 
     @GetMapping("/user/{userId}")

@@ -3,6 +3,10 @@ package com.nhom5.backend.controller;
 import com.nhom5.backend.model.InterviewBooking;
 import com.nhom5.backend.service.InterviewBookingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +21,18 @@ public class InterviewBookingController {
     private InterviewBookingService interviewBookingService;
 
     @GetMapping
-    public List<InterviewBooking> getAll() {
-        return interviewBookingService.getAllInterviewBookings();
+    public ResponseEntity<List<InterviewBooking>> getAll(
+            @RequestParam(name = "_page", defaultValue = "1") int page,
+            @RequestParam(name = "_limit", defaultValue = "6") int limit) {
+        
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        Page<InterviewBooking> ibPage = interviewBookingService.getInterviewBookingsPaginated(pageable);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("x-total-count", String.valueOf(ibPage.getTotalElements()));
+        headers.add("Access-Control-Expose-Headers", "x-total-count");
+
+        return ResponseEntity.ok().headers(headers).body(ibPage.getContent());
     }
 
     @GetMapping("/user/{userId}")

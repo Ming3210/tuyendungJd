@@ -4,6 +4,8 @@ import com.nhom5.backend.model.Job;
 import com.nhom5.backend.repository.JobRepository;
 import com.nhom5.backend.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,32 @@ public class JobServiceImpl implements JobService {
     @Override
     public List<Job> getAllJobs() {
         return jobRepository.findAll();
+    }
+
+    @Override
+    public Page<Job> getJobsPaginated(String flight, String industry, String province, String enterpriseId, String title, boolean random, Pageable pageable) {
+        String industryFilter = (industry != null && !industry.isEmpty()) ? industry : null;
+        String provinceFilter = (province != null && !province.isEmpty()) ? province : null;
+        String flightFilter = (flight != null && !flight.isEmpty()) ? flight : null;
+        String enterpriseIdFilter = (enterpriseId != null && !enterpriseId.isEmpty()) ? enterpriseId : null;
+        String titleFilter = (title != null && !title.isEmpty()) ? title : null;
+
+        if (random) {
+            return jobRepository.findRandomJobsPaginated(flightFilter, industryFilter, provinceFilter, pageable);
+        }
+
+        return jobRepository.findJobsFilteredPaginated(
+                flightFilter, 
+                industryFilter, 
+                provinceFilter, 
+                enterpriseIdFilter, 
+                titleFilter, 
+                pageable);
+    }
+
+    @Override
+    public List<Job> getRandomJobs(String flight, String industry, String province, int limit) {
+        return jobRepository.findRandomJobs(flight, industry, province, limit);
     }
 
     @Override
@@ -55,6 +83,11 @@ public class JobServiceImpl implements JobService {
             job.setUpdateDate(jobDetails.getUpdateDate());
             return jobRepository.save(job);
         });
+    }
+
+    @Override
+    public List<Job> getJobsByIds(List<Long> ids) {
+        return jobRepository.findByIdIn(ids);
     }
 
     @Override

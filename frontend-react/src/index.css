@@ -1,0 +1,57 @@
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+:root {
+  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+.font-sf-pro-display {
+  font-family: "SF Pro Display", sans-serif;
+}
+
+/* NProgress Customization */
+#nprogress .bar {
+  background: #bc2228 !important;
+  height: 4px !important;
+  box-shadow: 0 0 10px #bc2228, 0 0 5px #bc2228 !important;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px #bc2228, 0 0 5px #bc2228 !important;
+}
+
+#nprogress .spinner-icon {
+  border-top-color: #bc2228 !important;
+  border-left-color: #bc2228 !important;
+}
+
+/* Loading Bar Animation */
+@keyframes loading-bar {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0); }
+  100% { transform: translateX(100%); }
+}
+
+/* Page Entrance Animation */
+@keyframes page-entrance {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-entrance {
+  animation: page-entrance 0.5s ease-out forwards;
+}

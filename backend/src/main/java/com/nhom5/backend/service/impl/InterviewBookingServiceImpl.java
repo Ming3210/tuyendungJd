@@ -4,6 +4,8 @@ import com.nhom5.backend.model.InterviewBooking;
 import com.nhom5.backend.repository.InterviewBookingRepository;
 import com.nhom5.backend.service.InterviewBookingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,11 @@ public class InterviewBookingServiceImpl implements InterviewBookingService {
     @Override
     public List<InterviewBooking> getAllInterviewBookings() {
         return interviewBookingRepository.findAll();
+    }
+
+    @Override
+    public Page<InterviewBooking> getInterviewBookingsPaginated(Pageable pageable) {
+        return interviewBookingRepository.findAll(pageable);
     }
 
     @Override

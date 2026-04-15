@@ -4,6 +4,8 @@ import com.nhom5.backend.model.User;
 import com.nhom5.backend.repository.UserRepository;
 import com.nhom5.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+    
+    @Override
+    public Page<User> getUsersPaginated(String role, String q, Pageable pageable) {
+        String roleFilter = (role != null && !role.isEmpty()) ? role : null;
+        String qFilter = (q != null && !q.isEmpty()) ? q : null;
+        return userRepository.findUsersPaginated(roleFilter, qFilter, pageable);
     }
 
     @Override

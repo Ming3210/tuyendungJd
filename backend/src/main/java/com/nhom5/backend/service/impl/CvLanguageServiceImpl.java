@@ -4,6 +4,8 @@ import com.nhom5.backend.model.CvLanguage;
 import com.nhom5.backend.repository.CvLanguageRepository;
 import com.nhom5.backend.service.CvLanguageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,11 @@ public class CvLanguageServiceImpl implements CvLanguageService {
     @Override
     public List<CvLanguage> getAllCvLanguages() {
         return cvLanguageRepository.findAll();
+    }
+
+    @Override
+    public Page<CvLanguage> getCvLanguagesPaginated(Pageable pageable) {
+        return cvLanguageRepository.findAll(pageable);
     }
 
     @Override

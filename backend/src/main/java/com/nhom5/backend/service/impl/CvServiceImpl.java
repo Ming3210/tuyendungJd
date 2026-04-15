@@ -4,6 +4,8 @@ import com.nhom5.backend.model.Cv;
 import com.nhom5.backend.repository.CvRepository;
 import com.nhom5.backend.service.CvService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,11 @@ public class CvServiceImpl implements CvService {
     @Override
     public List<Cv> getAllCvs() {
         return cvRepository.findAll();
+    }
+
+    @Override
+    public Page<Cv> getCvsPaginated(Pageable pageable) {
+        return cvRepository.findAll(pageable);
     }
 
     @Override
