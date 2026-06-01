@@ -1,16 +1,16 @@
 import React from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Navigate, Route, HashRouter as Router, Routes } from 'react-router-dom';
 import AdminLayout from './admin/layouts/AdminLayout';
-import AdminUsers from './pages/admin/AdminUsers';
-import AdminJobs from './pages/admin/AdminJobs';
-import AdminEnterprises from './pages/admin/AdminEnterprises';
-import AdminCvs from './pages/admin/AdminCvs';
 import AdminCertificates from './pages/admin/AdminCertificates';
-import AdminLanguages from './pages/admin/AdminLanguages';
+import AdminCvs from './pages/admin/AdminCvs';
+import AdminEnterprises from './pages/admin/AdminEnterprises';
 import AdminInterviews from './pages/admin/AdminInterviews';
+import AdminJobs from './pages/admin/AdminJobs';
+import AdminLanguages from './pages/admin/AdminLanguages';
+import AdminUsers from './pages/admin/AdminUsers';
 
 // Mock components until we port them
-const Dashboard = () => <div><h2>Trang chủ Admin</h2><p>Chào mừng đến với trang quản trị.</p></div>;
+const Dashboard = () => <div><h2>Trang chủ Admin ^o^</h2><p>Chào mừng đến với trang quản trị.</p></div>;
 
 const AdminApp: React.FC = () => {
   return (

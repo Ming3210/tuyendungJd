@@ -1,9 +1,9 @@
-import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { App as AntdAppConfig } from 'antd';
-import MainLayout from './layouts/MainLayout';
+import React, { Suspense, lazy } from 'react';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import PageLoader from './components/common/PageLoader';
 import ScrollToTop from './components/common/ScrollToTop';
+import MainLayout from './layouts/MainLayout';
 
 // Lazy load pages
 const Login = lazy(() => import('./pages/client/auth/Login'));
