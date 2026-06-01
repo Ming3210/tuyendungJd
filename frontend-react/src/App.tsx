@@ -1,6 +1,7 @@
 import { App as AntdAppConfig } from 'antd';
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import DisclaimerModal from './components/common/DisclaimerModal';
 import PageLoader from './components/common/PageLoader';
 import ScrollToTop from './components/common/ScrollToTop';
 import MainLayout from './layouts/MainLayout';
@@ -35,9 +36,30 @@ const EnterpriseDetail = lazy(() => import('./pages/enterprise/EnterpriseDetail'
 const EnterpriseJobManager = lazy(() => import('./pages/enterprise/EnterpriseJobManager'));
 const EnterpriseInterviewManager = lazy(() => import('./pages/enterprise/EnterpriseInterviewManager'));
 const App: React.FC = () => {
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+
+  useEffect(() => {
+    try {
+      const seen = localStorage.getItem('nhom5_disclaimer_seen');
+      if (!seen) setShowDisclaimer(true);
+    } catch (e) {
+      setShowDisclaimer(true);
+    }
+  }, []);
+
+  const handleCloseDisclaimer = () => {
+    try {
+      localStorage.setItem('nhom5_disclaimer_seen', '1');
+    } catch (e) {
+      // ignore
+    }
+    setShowDisclaimer(false);
+  };
   return (
     <AntdAppConfig>
       <Router>
+        {/* Global disclaimer shown once */}
+        <DisclaimerModal isOpen={showDisclaimer} onClose={handleCloseDisclaimer} />
         <ScrollToTop />
         <Routes>
           {/* Auth Routes (No layout) */}
