@@ -15,7 +15,7 @@ const DisclaimerModal: React.FC<Props> = ({ isOpen, onClose }) => {
         <h2 className="text-xl font-semibold mb-3">Thông báo (Disclaimer)</h2>
         <p className="mb-4">
           Đây là bản deploy thử nghiệm. Chức năng đã đầy đủ nhưng nhiều ảnh đã để lâu nên có thể hiển thị lỗi hoặc không tải được. Xin thông
-          cảm! Cảm ơn bạn đã ghé thăm và trải nghiệm sản phẩm của chúng tôi. Nếu bạn gặp bất kỳ vấn đề nào, vui lòng liên hệ với chúng tôi để được hỗ trợ.
+          cảm! Cảm ơn bạn đã ghé thăm và trải nghiệm sản phẩm của chúng tôi. Nếu bạn gặp bất kỳ vấn đề nào, vui lòng liên hệ với chúng tôi để được hỗ trợ. ^o^
         </p>
         <div className="flex justify-end">
           <button
