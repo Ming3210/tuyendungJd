@@ -10,7 +10,12 @@
 </p>
 
 ---
-
+ <h1>Admin acc: admin@gmail.com</h1>
+ <h1>Partner acc: em@gmail.com</h1>
+ <h1>Partner acc: phuong@gmail.com</h1>
+ <h1>Partner acc: phuc@gmail.com</h1>
+ <h1>Pass: 123456</h1>
+ 
 ## The Strategic "Why"
 
 > The modern recruitment landscape is fraught with inefficiencies: manual job description management, disjointed applicant tracking, and a lack of centralized data lead to wasted time, increased costs, and missed opportunities to secure top talent. Without a unified, scalable solution, organizations struggle to maintain consistency and agility in their hiring efforts.
