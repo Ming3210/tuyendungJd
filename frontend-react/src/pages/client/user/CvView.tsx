@@ -117,10 +117,10 @@ const CvView: React.FC = () => {
   };
 
   return (
-    <div className="font-sf-pro-display">
+    <div className="w-full">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 m-0">Quản lý Hồ sơ & CV</h1>
-        <p className="text-gray-500 mt-2">Quản lý các hồ sơ CV của bạn để ứng tuyển nhanh chóng.</p>
+        <h1 className="text-2xl font-extrabold text-gray-900 m-0 leading-tight">Quản lý Hồ sơ & CV</h1>
+        <p className="text-gray-500 mt-1 text-sm">Quản lý các hồ sơ CV của bạn để ứng tuyển nhanh chóng.</p>
       </div>
 
       <div className="bg-red-50/50 rounded-xl border border-red-100 p-6 mb-8">

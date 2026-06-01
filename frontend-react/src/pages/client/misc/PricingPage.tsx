@@ -64,7 +64,7 @@ const PricingPage: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAppSelector((state) => state.auth);
   const { currentSubscription, loading } = useAppSelector((state) => state.vip);
-  
+
   const [searchParams] = useSearchParams();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
@@ -92,7 +92,7 @@ const PricingPage: React.FC = () => {
       navigate(`/login?redirect=${redirectPath}`);
       return;
     }
-    
+
     if (plan.type === 'free') return;
 
     setSelectedPlan(plan);
@@ -124,8 +124,8 @@ const PricingPage: React.FC = () => {
     }
   };
 
-  const qrUrl = currentSubscription 
-    ? `https://img.vietqr.io/image/TPB-0987654321-compact.png?amount=${selectedPlan?.amount}&addInfo=${currentSubscription.transactionCode}&accountName=ANTIGRAVITY ADMIN`
+  const qrUrl = currentSubscription
+    ? `https://img.vietqr.io/image/TPB-0355129455-compact.png?amount=${selectedPlan?.amount}&addInfo=${currentSubscription.transactionCode}&accountName=ANTIGRAVITY ADMIN`
     : '';
 
   return (
@@ -146,15 +146,14 @@ const PricingPage: React.FC = () => {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          {PLANS.map((plan) => (
+        <div className={`grid grid-cols-1 ${currentUser?.role === 'partner' ? 'md:grid-cols-1 max-w-md mx-auto' : 'md:grid-cols-3'} gap-8 relative`}>
+          {PLANS.filter(plan => currentUser?.role === 'partner' ? plan.type === 'business' : true).map((plan) => (
             <div
               key={plan.type}
-              className={`relative bg-white rounded-3xl p-8 transition-all duration-500 hover:-translate-y-2 flex flex-col ${
-                plan.popular 
-                  ? 'border-2 border-[#bc2228] shadow-2xl scale-105 z-10' 
-                  : 'border border-gray-100 shadow-xl'
-              }`}
+              className={`relative bg-white rounded-3xl p-8 transition-all duration-500 hover:-translate-y-2 flex flex-col ${plan.popular
+                ? 'border-2 border-[#bc2228] shadow-2xl scale-105 z-10'
+                : 'border border-gray-100 shadow-xl'
+                }`}
             >
               {plan.popular && (
                 <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#bc2228] to-[#ff4d4f] text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
@@ -187,11 +186,10 @@ const PricingPage: React.FC = () => {
               <button
                 onClick={() => handleSubscribe(plan)}
                 disabled={loading}
-                className={`w-full py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 group ${
-                  plan.popular
-                    ? 'bg-[#bc2228] hover:bg-red-700 text-white shadow-lg shadow-red-200'
-                    : 'bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200'
-                }`}
+                className={`w-full py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 group ${plan.popular
+                  ? 'bg-[#bc2228] hover:bg-red-700 text-white shadow-lg shadow-red-200'
+                  : 'bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200'
+                  }`}
               >
                 {loading && selectedPlan?.type === plan.type ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -209,7 +207,7 @@ const PricingPage: React.FC = () => {
         {/* Payment Modal */}
         <Modal
           title={null}
-          visible={isModalVisible}
+          open={isModalVisible}
           onCancel={() => setIsModalVisible(false)}
           footer={null}
           width={500}
@@ -220,16 +218,16 @@ const PricingPage: React.FC = () => {
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-200 mx-auto mb-6">
               <QrCode className="w-10 h-10 text-white" />
             </div>
-            
+
             <h2 className="text-2xl font-bold text-gray-900 mb-2 font-sf-pro-display">Quét mã thanh toán</h2>
             <p className="text-gray-500 text-sm mb-8 px-8">
               Sử dụng ứng dụng ngân hàng của bạn để quét mã VietQR và thực hiện thanh toán cho gói <span className="font-bold text-gray-900">{selectedPlan?.name}</span>.
             </p>
 
             <div className="bg-white p-6 rounded-3xl border-2 border-dashed border-gray-200 flex justify-center mb-8 relative group">
-              <img 
-                src={qrUrl} 
-                alt="VietQR Payment" 
+              <img
+                src={qrUrl}
+                alt="VietQR Payment"
                 className="w-64 h-64 object-contain"
               />
               <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors cursor-zoom-in" />

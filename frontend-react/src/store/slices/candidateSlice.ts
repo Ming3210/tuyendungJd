@@ -19,6 +19,8 @@ export interface Candidate {
 interface CandidateState {
   candidates: Candidate[];
   totalCandidates: number;
+  currentPage: number;
+  limit: number;
   loading: boolean;
   error: string | null;
 }
@@ -26,35 +28,71 @@ interface CandidateState {
 const initialState: CandidateState = {
   candidates: [],
   totalCandidates: 0,
+  currentPage: 1,
+  limit: 8,
   loading: false,
   error: null,
 };
 
-export const fetchAllCandidates = createAsyncThunk('candidate/fetchAll', async () => {
-  const response = await api.get('/users');
-  return response.data;
-});
+export const fetchCandidatesPaginated = createAsyncThunk(
+  'candidate/fetchPaginated',
+  async ({ page = 1, limit = 8, sort = '', q = '', role = 'user' }: { 
+    page?: number; 
+    limit?: number; 
+    sort?: string; 
+    q?: string;
+    role?: string;
+  } = {}) => {
+    // Artificial delay for testing skeleton loaders
+    await new Promise(resolve => setTimeout(resolve, 700));
+    
+    const response = await api.get('/users', {
+      params: {
+        _page: page,
+        _limit: limit,
+        _sort: sort || undefined,
+        q: q || undefined,
+        role: role || undefined,
+      },
+    });
+    return {
+      candidates: response.data,
+      totalCandidates: parseInt(response.headers['x-total-count'] || '0', 10),
+      page,
+      limit,
+    };
+  }
+);
+
+// Backward compatibility or for internal use
+export const fetchAllCandidates = fetchCandidatesPaginated;
 
 const candidateSlice = createSlice({
   name: 'candidate',
   initialState,
-  reducers: {},
+  reducers: {
+    setCandidatePage: (state, action) => {
+      state.currentPage = action.payload;
+    }
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchAllCandidates.pending, (state) => {
+      .addCase(fetchCandidatesPaginated.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchAllCandidates.fulfilled, (state, action) => {
+      .addCase(fetchCandidatesPaginated.fulfilled, (state, action) => {
         state.loading = false;
-        // Filter only users with role 'user' as candidates
-        state.candidates = (action.payload as Candidate[]).filter(c => c.role === 'user');
-        state.totalCandidates = state.candidates.length;
+        state.candidates = action.payload.candidates;
+        state.totalCandidates = action.payload.totalCandidates;
+        state.currentPage = action.payload.page;
+        state.limit = action.payload.limit;
       })
-      .addCase(fetchAllCandidates.rejected, (state, action) => {
+      .addCase(fetchCandidatesPaginated.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch candidates';
       });
   },
 });
 
+export const { setCandidatePage } = candidateSlice.actions;
 export default candidateSlice.reducer;

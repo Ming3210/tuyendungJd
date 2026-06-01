@@ -12,21 +12,48 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    User findByEmail(String email);
-    User findByUserName(String userName);
+       User findByEmail(String email);
 
-    @Query("SELECT u FROM User u WHERE u.userName = :usernameOrEmail OR u.email = :usernameOrEmail")
-    Optional<User> findByUserNameOrEmail(@Param("usernameOrEmail") String usernameOrEmail);
+       User findByUserName(String userName);
 
-    @Query(value = "SELECT * FROM users WHERE " +
-           "(:role IS NULL OR role = :role) " +
-           "AND (:q IS NULL OR user_name LIKE %:q% OR email LIKE %:q%)",
-           countQuery = "SELECT count(*) FROM users WHERE " +
-           "(:role IS NULL OR role = :role) " +
-           "AND (:q IS NULL OR user_name LIKE %:q% OR email LIKE %:q%)",
-           nativeQuery = true)
-    Page<User> findUsersPaginated(
-            @Param("role") String role, 
-            @Param("q") String q, 
-            Pageable pageable);
+       @Query("SELECT u FROM User u WHERE u.userName = :usernameOrEmail OR u.email = :usernameOrEmail")
+       Optional<User> findByUserNameOrEmail(@Param("usernameOrEmail") String usernameOrEmail);
+
+       @Query(value = "SELECT * FROM users WHERE " +
+                     "(:role IS NULL OR role = :role) " +
+                     "AND (:q IS NULL OR user_name LIKE CONCAT('%', :q, '%') OR email LIKE CONCAT('%', :q, '%'))", countQuery = "SELECT count(*) FROM users WHERE "
+                                   +
+                                   "(:role IS NULL OR role = :role) " +
+                                   "AND (:q IS NULL OR user_name LIKE CONCAT('%', :q, '%') OR email LIKE CONCAT('%', :q, '%'))", nativeQuery = true)
+       Page<User> findUsersPaginated(
+                     @Param("role") String role,
+                     @Param("q") String q,
+                     Pageable pageable);
+
+       @Query(value = "SELECT * FROM users WHERE " +
+                     "(:role IS NULL OR role = :role) " +
+                     "AND (:q IS NULL OR user_name LIKE CONCAT('%', :q, '%') OR email LIKE CONCAT('%', :q, '%')) " +
+                     "ORDER BY RAND()", 
+                     countQuery = "SELECT count(*) FROM users WHERE " +
+                                   "(:role IS NULL OR role = :role) " +
+                                   "AND (:q IS NULL OR user_name LIKE CONCAT('%', :q, '%') OR email LIKE CONCAT('%', :q, '%'))", nativeQuery = true)
+       Page<User> findRandomUsersPaginated(
+                     @Param("role") String role,
+                     @Param("q") String q,
+                     Pageable pageable);
+
+       @Query(value = "SELECT * FROM users WHERE " +
+                     "(:role IS NULL OR role = :role) " +
+                     "AND (:q IS NULL OR user_name LIKE CONCAT('%', :q, '%') OR email LIKE CONCAT('%', :q, '%')) " +
+                     "ORDER BY " +
+                     "CASE WHEN :sort = 'asc' THEN full_name END ASC, " +
+                     "CASE WHEN :sort = 'desc' THEN full_name END DESC", 
+                     countQuery = "SELECT count(*) FROM users WHERE " +
+                                   "(:role IS NULL OR role = :role) " +
+                                   "AND (:q IS NULL OR user_name LIKE CONCAT('%', :q, '%') OR email LIKE CONCAT('%', :q, '%'))", nativeQuery = true)
+       Page<User> findUsersPaginatedSorted(
+                     @Param("role") String role,
+                     @Param("q") String q,
+                     @Param("sort") String sort,
+                     Pageable pageable);
 }

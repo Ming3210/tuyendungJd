@@ -8,7 +8,12 @@ import java.util.Optional;
 
 public interface JobService {
     List<Job> getAllJobs();
-    Page<Job> getJobsPaginated(String flight, String industry, String province, String enterpriseId, String title, boolean random, Pageable pageable);
+    Page<Job> getJobsPaginated(
+            String flight, String industry, String province, Long enterpriseId, String title, 
+            String experience, Boolean saturdayOff, String jobCategory, String companyType, 
+            String rank, Double minSalary, Double maxSalary, Boolean negotiable, 
+            String jobLevel, String education, String searchMode,
+            boolean random, Pageable pageable);
     List<Job> getRandomJobs(String flight, String industry, String province, int limit);
     Optional<Job> getJobById(Long id);
     Job createJob(Job job);

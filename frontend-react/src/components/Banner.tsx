@@ -8,7 +8,7 @@ const Banner: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { provinces } = useAppSelector((state) => state.provinces);
-  
+
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedProvince, setSelectedProvince] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,7 +32,7 @@ const Banner: React.FC = () => {
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (positionQuery) params.append('position', positionQuery);
+    if (positionQuery) params.append('title', positionQuery);
     if (selectedProvince) params.append('province', selectedProvince);
     navigate(`/all-jobs?${params.toString()}`);
   };
@@ -40,10 +40,10 @@ const Banner: React.FC = () => {
   return (
     <div className="relative h-[435px] flex items-center justify-center text-white overflow-hidden">
       {/* Background Image with Gradient Overlay */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center transition-transform duration-10000 hover:scale-110"
         style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(25, 16, 58, 0.7), rgba(25, 16, 58, 0.4)), url('https://s3-alpha-sig.figma.com/img/acee/2e78/87d12368bef93dfc7b5f89b9927a3239?Expires=1733097600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=n2WBOO-jge3EiwZdCvHqp2c5yI9tWsKIo8gmt9KOreY-yAp9R5Wr8WKsNmUlOJ9ACao6fVkJkpqwrqMUdGOkacM49eBwUzyAEVQs~BGZeNUcY~9VpBw0np2B8jfW-G~dD7VQ0LSKolllLeqeNGUa0ClRXIo9jN8F0rBcLv0bYhop53HqhOPtnM-b0CNH6poj4JEXxAUiiIcGIWzpk-m1loUqin8VHG~PD4cP2lgO09ffCbDvG5M8kJiZVbS6ahDUzEe9zAmDwRcrH-C-nU0XVVtGz2HTrVPmSzGtNBqLVAPD6l-TBhqIqLZJqPX-OljsnT2SV1nsJF9zEvLjlrLRnA__')`,
+          backgroundImage: `linear-gradient(to bottom, rgba(25, 16, 58, 0.7), rgba(25, 16, 58, 0.4)), url('https://res.cloudinary.com/djppquc7s/image/upload/v1766996337/BannerHomePage_l7xsju.png')`,
           backgroundPosition: 'center',
           backgroundSize: 'cover'
         }}
@@ -57,7 +57,7 @@ const Banner: React.FC = () => {
 
         {/* Search Bar Container */}
         <div className="flex flex-col md:flex-row items-center gap-4 bg-white/10 backdrop-blur-md p-3 rounded-2xl w-full border border-white/20 shadow-2xl">
-          
+
           {/* Position Input */}
           <div className="flex-grow flex items-center bg-white p-4 rounded-xl shadow-inner w-full">
             <Search className="text-gray-400 w-5 h-5" />
@@ -72,7 +72,7 @@ const Banner: React.FC = () => {
 
           {/* Province Dropdown */}
           <div className="relative w-full md:w-64">
-            <div 
+            <div
               onClick={toggleDropdown}
               className="flex items-center justify-between bg-white p-4 rounded-xl shadow-inner cursor-pointer hover:bg-gray-50 transition-colors"
             >
@@ -97,7 +97,7 @@ const Banner: React.FC = () => {
                   />
                 </div>
                 <ul className="max-h-60 overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-gray-200">
-                  <li 
+                  <li
                     className="px-4 py-2.5 hover:bg-red-50 hover:text-[#bc2228] cursor-pointer transition-colors text-sm font-medium"
                     onClick={() => selectProvince('')}
                   >

@@ -8,10 +8,11 @@ import java.util.Optional;
 
 public interface EnterpriseService {
     List<Enterprise> getAllEnterprises();
-    Page<Enterprise> getEnterprisesPaginated(Pageable pageable);
+    Page<Enterprise> getEnterprisesPaginated(String industry, String sort, Pageable pageable);
     Optional<Enterprise> getEnterpriseById(Long id);
     Enterprise createEnterprise(Enterprise enterprise);
     Optional<Enterprise> updateEnterprise(Long id, Enterprise enterpriseDetails);
     List<Enterprise> getEnterprisesByUserId(Long userId);
+    List<Enterprise> getEnterprisesByIds(List<Long> ids);
     boolean deleteEnterprise(Long id);
 }

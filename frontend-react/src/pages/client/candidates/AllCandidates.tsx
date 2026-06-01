@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { fetchAllCandidates } from '../../../store/slices/candidateSlice';
+import { fetchCandidatesPaginated } from '../../../store/slices/candidateSlice';
 import { checkVipStatus } from '../../../store/slices/vipSlice';
 import { useNavigate } from 'react-router-dom';
 import { Pagination } from 'antd';
@@ -21,7 +21,7 @@ import {
 const AllCandidates: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { candidates, loading } = useAppSelector((state) => state.candidate);
+  const { candidates, loading, totalCandidates } = useAppSelector((state) => state.candidate);
   const { currentUser } = useAppSelector((state) => state.auth);
   const { isVip } = useAppSelector((state) => state.vip);
 
@@ -39,11 +39,23 @@ const AllCandidates: React.FC = () => {
     isVip;
 
   useEffect(() => {
-    dispatch(fetchAllCandidates());
+    // Block candidate role completely
+    if (currentUser?.role === 'candidate') {
+      navigate('/403');
+      return;
+    }
+
+    dispatch(fetchCandidatesPaginated({ 
+      page: currentPage, 
+      limit: itemsPerPage, 
+      sort: sortOption, 
+      q: searchText 
+    }));
+    
     if (currentUser?.id) {
       dispatch(checkVipStatus(currentUser.id));
     }
-  }, [dispatch, currentUser?.id]);
+  }, [dispatch, currentUser, navigate, currentPage, sortOption, searchText]);
 
   const calculateAge = (birthdate: string) => {
     if (!birthdate) return 0;
@@ -60,27 +72,6 @@ const AllCandidates: React.FC = () => {
     };
     return gradients[level] || 'from-gray-400 to-gray-500';
   };
-
-  const filteredCandidates = useMemo(() => {
-    let result = [...candidates];
-    if (searchText) {
-      result = result.filter(c =>
-        (c.fullName || '').toLowerCase().includes(searchText.toLowerCase()) ||
-        (c.position || '').toLowerCase().includes(searchText.toLowerCase())
-      );
-    }
-    if (sortOption === 'asc') {
-      result.sort((a, b) => (a.fullName || '').localeCompare(b.fullName || ''));
-    } else {
-      result.sort((a, b) => (b.fullName || '').localeCompare(a.fullName || ''));
-    }
-    return result;
-  }, [candidates, sortOption, searchText]);
-
-  const currentItems = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredCandidates.slice(start, start + itemsPerPage);
-  }, [filteredCandidates, currentPage, itemsPerPage]);
 
   const handleClick = (id: string | number) => {
     if (!isPremiumUser) return;
@@ -191,7 +182,7 @@ const AllCandidates: React.FC = () => {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {currentItems.map((candidate, index) => (
+              {candidates.map((candidate, index) => (
                 <div
                   key={candidate.id}
                   onClick={() => handleClick(candidate.id)}
@@ -296,7 +287,7 @@ const AllCandidates: React.FC = () => {
                   </div>
                 </div>
               ))}
-              {currentItems.length === 0 && (
+              {candidates.length === 0 && (
                 <div className="col-span-full py-20 text-center bg-white rounded-2xl border border-gray-100 shadow-sm">
                   <Users className="w-12 h-12 text-gray-200 mx-auto mb-4" />
                   <p className="text-gray-500 font-medium">Không tìm thấy ứng viên nào.</p>
@@ -308,7 +299,7 @@ const AllCandidates: React.FC = () => {
             <div className="flex justify-center mt-12 pb-8">
               <Pagination
                 current={currentPage}
-                total={filteredCandidates.length}
+                total={totalCandidates}
                 pageSize={itemsPerPage}
                 onChange={(page) => {
                   setCurrentPage(page);

@@ -23,9 +23,16 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
-    public Page<User> getUsersPaginated(String role, String q, Pageable pageable) {
+    public Page<User> getUsersPaginated(String role, String q, String sort, Pageable pageable) {
         String roleFilter = (role != null && !role.isEmpty()) ? role : null;
         String qFilter = (q != null && !q.isEmpty()) ? q : null;
+        
+        if ("random".equals(sort)) {
+            return userRepository.findRandomUsersPaginated(roleFilter, qFilter, pageable);
+        } else if ("asc".equals(sort) || "desc".equals(sort)) {
+            return userRepository.findUsersPaginatedSorted(roleFilter, qFilter, sort, pageable);
+        }
+        
         return userRepository.findUsersPaginated(roleFilter, qFilter, pageable);
     }
 

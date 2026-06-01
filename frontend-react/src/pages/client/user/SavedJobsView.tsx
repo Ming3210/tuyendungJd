@@ -53,11 +53,11 @@ const SavedJobsView: React.FC = () => {
   );
 
   return (
-    <div className="font-sf-pro-display">
+    <div className="w-full">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 m-0">Việc làm đã lưu</h1>
-          <p className="text-gray-500 mt-2">Xem lại những việc làm bạn đã quan tâm.</p>
+          <h1 className="text-2xl font-extrabold text-gray-900 m-0 leading-tight">Việc làm đã lưu</h1>
+          <p className="text-gray-500 mt-1 text-sm">Xem lại những việc làm bạn đã quan tâm.</p>
         </div>
         {savedJobs.length > 0 && (
           <Input

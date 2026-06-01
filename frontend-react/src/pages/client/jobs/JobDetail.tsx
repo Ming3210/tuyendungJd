@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchJobById, fetchJobsByPage, clearCurrentJob, fetchJobsByEnterprise } from '../../../store/slices/jobSlice';
 import { fetchAllBookings, addBooking } from '../../../store/slices/interviewBookingSlice';
-import { fetchSavedJobs, toggleSaveJob } from '../../../store/slices/userSlice';
+import { fetchSavedJobs, toggleSaveJob, fetchAllCvs } from '../../../store/slices/userSlice';
 import { fetchEnterpriseById } from '../../../store/slices/enterpriseSlice';
 import {
   ChevronRight,
@@ -21,10 +21,13 @@ import {
   Building2,
   Phone,
   Mail,
-  ExternalLink
+  ExternalLink,
+  Layers
 } from 'lucide-react';
-import { message, Modal, Tag, Divider } from 'antd';
+import { message, Modal, Tag, Divider, App } from 'antd';
 import dayjs from 'dayjs';
+import ApplyJobModal from '../../../components/jobs/ApplyJobModal';
+import { toggleFollow, checkFollowStatus } from '../../../store/slices/followSlice';
 
 const JobDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -35,7 +38,11 @@ const JobDetail: React.FC = () => {
   const { currentEnterprise } = useAppSelector((state) => state.enterprise);
   const { bookings } = useAppSelector((state) => state.interviewBooking);
   const { currentUser } = useAppSelector((state) => state.auth);
-  const { savedJobs } = useAppSelector((state) => state.user);
+  const { savedJobs, cvs } = useAppSelector((state) => state.user);
+  const { followingIds } = useAppSelector((state) => state.follow);
+  const [isApplyModalOpen, setIsApplyModalOpen] = React.useState(false);
+
+  const isFollowing = currentEnterprise ? followingIds[currentEnterprise.id] : false;
 
   useEffect(() => {
     if (id) {
@@ -43,6 +50,7 @@ const JobDetail: React.FC = () => {
       dispatch(fetchAllBookings({ page: 1, limit: 1000 }));
       if (currentUser?.id) {
         dispatch(fetchSavedJobs(currentUser.id));
+        dispatch(fetchAllCvs({ page: 1, limit: 1000 }));
       }
     }
     return () => {
@@ -54,9 +62,23 @@ const JobDetail: React.FC = () => {
   useEffect(() => {
     if (currentJob?.enterpriseId) {
       dispatch(fetchEnterpriseById(currentJob.enterpriseId));
-      dispatch(fetchJobsByEnterprise(currentJob.enterpriseId));
+      dispatch(fetchJobsByEnterprise({ enterpriseId: currentJob.enterpriseId }));
+      if (currentUser?.id) {
+        dispatch(checkFollowStatus({ userId: Number(currentUser.id), enterpriseId: Number(currentJob.enterpriseId) }));
+      }
     }
-  }, [currentJob?.enterpriseId, dispatch]);
+  }, [currentJob?.enterpriseId, dispatch, currentUser?.id]);
+
+  const handleFollowToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!currentUser) {
+      message.warning('Vui lòng đăng nhập để theo dõi công ty');
+      return;
+    }
+    if (currentJob?.enterpriseId) {
+      dispatch(toggleFollow({ userId: Number(currentUser.id), enterpriseId: Number(currentJob.enterpriseId) }));
+    }
+  };
 
   const hasApplied = useMemo(() => {
     if (!currentUser || !id) return false;
@@ -81,27 +103,44 @@ const JobDetail: React.FC = () => {
       return;
     }
 
-    Modal.confirm({
-      title: 'Xác nhận ứng tuyển',
-      content: `Bạn chắc chắn muốn ứng tuyển cho vị trí ${currentJob?.title}?`,
-      onOk: async () => {
-        const payload = {
-          jobId: Number(id),
-          userId: currentUser.id,
-          enterpriseId: Number(currentJob?.enterpriseId),
-          status: 'pending' as const,
-          createAt: new Date().toISOString(),
-          updateStatusTime: [new Date().toLocaleString()],
-          workingTime: currentJob?.workingTime,
-        };
-        try {
-          await dispatch(addBooking(payload)).unwrap();
-          message.success('Ứng tuyển thành công!');
-        } catch (error) {
-          message.error('Có lỗi xảy ra khi ứng tuyển.');
+    // Validate if the user has uploaded at least one CV
+    const userCvs = cvs.filter(cv => Number(cv.userId) === Number(currentUser.id) || String(cv.userId) === String(currentUser.id));
+    if (userCvs.length === 0) {
+      Modal.confirm({
+        title: 'Chưa có hồ sơ (CV)',
+        content: 'Bạn cần phải tạo hoặc tải lên ít nhất một CV để có thể ứng tuyển. Bạn có muốn chuyển đến trang Quản lý CV ngay bây giờ?',
+        okText: 'Tới Quản lý CV',
+        cancelText: 'Hủy',
+        onOk: () => {
+          navigate('/profile/cv');
         }
-      }
-    });
+      });
+      return;
+    }
+
+    setIsApplyModalOpen(true);
+  };
+
+  const onConfirmApply = async (values: { cvId: number; message: string }) => {
+    const payload = {
+      jobId: Number(id),
+      userId: currentUser?.id,
+      cvId: values.cvId,
+      enterpriseId: Number(currentJob?.enterpriseId),
+      status: 'pending' as const,
+      createAt: new Date().toISOString(),
+      updateStatusTime: [new Date().toLocaleString()],
+      workingTime: currentJob?.workingTime,
+      description: values.message ? [values.message] : [],
+    };
+
+    try {
+      await dispatch(addBooking(payload)).unwrap();
+      message.success('Ứng tuyển thành công! Nhà tuyển dụng sẽ sớm liên hệ với bạn.');
+      setIsApplyModalOpen(false);
+    } catch (error) {
+      message.error('Có lỗi xảy ra khi ứng tuyển. Vui lòng thử lại sau.');
+    }
   };
 
   const handleToggleSave = async () => {
@@ -168,7 +207,13 @@ const JobDetail: React.FC = () => {
             <div className="flex-grow">
               <h1 className="text-2xl font-bold text-gray-900 mb-3">{currentJob.title}</h1>
               <div className="flex flex-wrap gap-2 mb-4">
-                <Tag color="green" className="rounded-full px-3">{currentJob.level || 'Member'}</Tag>
+                {Array.isArray(currentJob.rank) ? (
+                  currentJob.rank.map((r, idx) => (
+                    <Tag key={idx} color="green" className="rounded-full px-3">{r}</Tag>
+                  ))
+                ) : (
+                  <Tag color="green" className="rounded-full px-3">{currentJob.rank || 'Member'}</Tag>
+                )}
                 <Tag color="red" className="rounded-full px-3">{currentJob.industry}</Tag>
                 {currentEnterprise?.status === 'verified' && (
                   <Tag color="blue" className="rounded-full px-3 flex items-center gap-1">
@@ -183,28 +228,30 @@ const JobDetail: React.FC = () => {
                 </div>
                 <Link to={`/company/${currentJob.enterpriseId}`} className="flex items-center gap-1.5 font-medium hover:text-red-600 transition-colors">
                   <Building2 className="w-4 h-4 text-blue-500" />
-                  <span>{currentJob.enterpriseName}</span>
+                  <span>{currentJob.enterprise?.title || 'Đang cập nhật'}</span>
                 </Link>
               </div>
             </div>
             <div className="flex flex-col gap-3 min-w-[180px]">
-              {hasApplied ? (
-                <button className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-600 text-white rounded-xl font-bold cursor-default shadow-lg shadow-emerald-100">
-                  <CheckCircle className="w-5 h-5" /> Đã ứng tuyển
-                </button>
-              ) : (
-                <button
-                  onClick={handleApply}
-                  className="w-full flex items-center justify-center gap-2 py-3 bg-[#bc2228] hover:bg-red-700 text-white rounded-xl font-bold shadow-lg shadow-red-100 transition-all active:scale-95"
-                >
-                  <Send className="w-5 h-5" /> Ứng tuyển ngay
-                </button>
+              {currentUser?.role !== 'partner' && (
+                hasApplied ? (
+                  <button className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-600 text-white rounded-xl font-bold cursor-default shadow-lg shadow-emerald-100">
+                    <CheckCircle className="w-5 h-5" /> Đã ứng tuyển
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleApply}
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-[#bc2228] hover:bg-red-700 text-white rounded-xl font-bold shadow-lg shadow-red-100 transition-all active:scale-95"
+                  >
+                    <Send className="w-5 h-5" /> Ứng tuyển ngay
+                  </button>
+                )
               )}
               <button
                 onClick={handleToggleSave}
                 className={`w-full flex items-center justify-center gap-2 py-3 border rounded-xl font-bold transition-all ${isJobSaved
-                    ? 'bg-red-50 border-red-200 text-[#bc2228]'
-                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                  ? 'bg-red-50 border-red-200 text-[#bc2228]'
+                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
                   }`}
               >
                 <Heart className={`w-5 h-5 ${isJobSaved ? 'fill-current' : ''}`} />
@@ -226,7 +273,17 @@ const JobDetail: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Mức lương</p>
-                  <p className="font-bold text-gray-900 text-lg">{currentJob.salary}</p>
+                  <p className="font-bold text-gray-900 text-lg">
+                    {currentJob.negotiable ? (
+                      <span className="text-red-600 font-extrabold text-2xl drop-shadow-sm">
+                        Thỏa thuận
+                      </span>
+                    ) : (
+                      <span className="text-red-500 font-bold text-2xl">
+                        {currentJob.salary}
+                      </span>
+                    )}
+                  </p>
                 </div>
               </div>
               <div className="flex gap-4 p-4 bg-gray-50 rounded-2xl hover:bg-blue-50 transition-colors group">
@@ -249,11 +306,20 @@ const JobDetail: React.FC = () => {
               </div>
               <div className="flex gap-4 p-4 bg-gray-50 rounded-2xl hover:bg-purple-50 transition-colors group">
                 <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
-                  <Award className="w-6 h-6" />
+                  <Layers className="w-6 h-6" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Cấp bậc</p>
-                  <p className="font-bold text-gray-900 text-lg">{currentJob.level || 'Member'}</p>
+                  <p className="font-bold text-gray-900 text-lg">{currentJob.jobLevel || 'Nhân viên'}</p>
+                </div>
+              </div>
+              <div className="flex gap-4 p-4 bg-gray-50 rounded-2xl hover:bg-orange-50 transition-colors group">
+                <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-orange-600 group-hover:scale-110 transition-transform">
+                  <Briefcase className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Học vấn</p>
+                  <p className="font-bold text-gray-900 text-lg">{currentJob.education || 'Không yêu cầu'}</p>
                 </div>
               </div>
             </div>
@@ -310,8 +376,7 @@ const JobDetail: React.FC = () => {
             <div className="bg-white rounded-2xl shadow-sm p-6 sm:p-8">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <span className="w-1.5 h-6 bg-[#bc2228] rounded-full"></span>
-                  Việc làm khác của {currentJob.enterpriseName}
+                  Việc làm khác của {currentJob.enterprise?.title || 'công ty'}
                 </h2>
                 <Link to="/all-jobs" className="text-[#bc2228] font-bold text-sm hover:underline">Xem thêm</Link>
               </div>
@@ -354,8 +419,8 @@ const JobDetail: React.FC = () => {
                 )}
               </div>
               <div className="overflow-hidden">
-                <div className="font-bold text-gray-900 text-lg truncate mb-1 group-hover:text-red-600" title={currentJob.enterpriseName}>
-                  {currentJob.enterpriseName}
+                <div className="font-bold text-gray-900 text-lg truncate mb-1 group-hover:text-red-600" title={currentJob.enterprise?.title}>
+                  {currentJob.enterprise?.title || 'Đang cập nhật'}
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-bold uppercase tracking-wider">
                   <Users className="w-3 h-3" />
@@ -363,6 +428,17 @@ const JobDetail: React.FC = () => {
                 </div>
               </div>
             </Link>
+            
+            <button
+              onClick={handleFollowToggle}
+              className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold transition-all mb-6 ${isFollowing
+                  ? 'bg-amber-50 text-amber-600 border border-amber-200'
+                  : 'bg-white border border-gray-200 text-gray-700 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200'
+                }`}
+            >
+              <Heart className={`w-4 h-4 ${isFollowing ? 'fill-current' : ''}`} />
+              {isFollowing ? 'Đang theo dõi' : 'Theo dõi công ty'}
+            </button>
 
             <div className="space-y-4 mb-8">
               <div className="flex gap-3 text-sm">
@@ -461,6 +537,13 @@ const JobDetail: React.FC = () => {
           </div>
         </div>
       </div>
+      <ApplyJobModal
+        open={isApplyModalOpen}
+        onCancel={() => setIsApplyModalOpen(false)}
+        onApply={onConfirmApply}
+        jobTitle={currentJob.title}
+        companyName={currentJob.enterprise?.title || ''}
+      />
     </div>
   );
 };

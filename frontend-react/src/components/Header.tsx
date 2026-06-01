@@ -1,16 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   DownOutlined, 
   HeartOutlined, 
   LogoutOutlined, 
-  SearchOutlined 
+  SearchOutlined,
+  BellOutlined
 } from '@ant-design/icons';
-import { Dropdown, Menu, Modal, message } from 'antd';
+import { Dropdown, Menu, Modal, message, Tag, Badge, Popover, List, Typography, Avatar } from 'antd';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { logout } from '../store/slices/authSlice';
 import { checkVipStatus } from '../store/slices/vipSlice';
-import { CrownOutlined } from '@ant-design/icons';
+import { fetchNotifications, markAsRead, markAllAsRead } from '../store/slices/notificationSlice';
+import { CrownOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+// Initialize relativeTime plugin
+dayjs.extend(relativeTime);
+
+const { Text } = Typography;
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -18,10 +27,21 @@ const Header: React.FC = () => {
   const dispatch = useAppDispatch();
   const { currentUser } = useAppSelector((state) => state.auth);
   const { isVip, planType } = useAppSelector((state) => state.vip);
+  const { notifications } = useAppSelector((state) => state.notification);
+
+  const unreadCount = useMemo(() => notifications.filter(n => !n.seen).length, [notifications]);
 
   useEffect(() => {
     if (currentUser?.id) {
       dispatch(checkVipStatus(currentUser.id));
+      dispatch(fetchNotifications(currentUser.id));
+      
+      // Polling for notifications every 2 minutes
+      const interval = setInterval(() => {
+        dispatch(fetchNotifications(currentUser.id));
+      }, 120000);
+      
+      return () => clearInterval(interval);
     }
   }, [dispatch, currentUser?.id]);
 
@@ -124,9 +144,23 @@ const Header: React.FC = () => {
             )}
           </div>
 
-          <Link to="/profile/cv" className="font-sf-pro-display text-black hover:text-[#bc2228]">
-            Hồ sơ & CV
+          <Link 
+            to="/all-companies" 
+            className={`font-sf-pro-display hover:text-[#bc2228] transition-colors ${location.pathname === '/all-companies' ? 'text-[#bc2228] font-bold' : 'text-black'}`}
+          >
+            Công ty
           </Link>
+
+          {currentUser?.role !== 'partner' && (
+            <Link to="/profile/cv" className="font-sf-pro-display text-black hover:text-[#bc2228]">
+              Hồ sơ & CV
+            </Link>
+          )}
+          {currentUser?.role === 'partner' && (
+            <Link to="/partner-applicants" className="font-sf-pro-display text-black hover:text-[#bc2228]">
+              Thống kê ứng viên
+            </Link>
+          )}
           <Link to="/about-us" className="font-sf-pro-display text-black hover:text-[#bc2228]">
             Về chúng tôi
           </Link>
@@ -139,7 +173,71 @@ const Header: React.FC = () => {
         </nav>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-6">
+        {currentUser && (
+          <Popover
+            placement="bottomRight"
+            trigger="click"
+            content={
+              <div className="w-80">
+                <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+                  <h3 className="font-bold text-base m-0">Thông báo</h3>
+                  <button 
+                    className="text-[#bc2228] text-xs font-bold bg-transparent border-none cursor-pointer hover:underline"
+                    onClick={() => dispatch(markAllAsRead(currentUser.id))}
+                  >
+                    Đánh dấu đã đọc hết
+                  </button>
+                </div>
+                <List
+                  dataSource={notifications.slice(0, 10)}
+                  className="max-h-[400px] overflow-y-auto scrollbar-hide"
+                  renderItem={(item) => (
+                    <List.Item 
+                      className={`cursor-pointer hover:bg-gray-50 px-3 transition-colors rounded-xl mb-1 border-none ${!item.seen ? 'bg-red-50/30' : ''}`}
+                      onClick={() => {
+                        dispatch(markAsRead(item.id));
+                        if (item.type === 'INTERVIEW') navigate('/profile/interviews');
+                      }}
+                    >
+                      <List.Item.Meta
+                        avatar={
+                          <Avatar 
+                            icon={item.type === 'INTERVIEW' ? <ClockCircleOutlined /> : <BellOutlined />} 
+                            className={item.type === 'INTERVIEW' ? 'bg-[#bc2228]' : 'bg-blue-500'}
+                          />
+                        }
+                        title={
+                          <div className="flex justify-between items-start">
+                             <Text strong={!item.seen} className="text-sm line-clamp-1">{item.title}</Text>
+                             {!item.seen && <div className="w-2 h-2 bg-red-500 rounded-full mt-1.5 shrink-0 ml-2" />}
+                          </div>
+                        }
+                        description={
+                          <div>
+                            <p className="text-xs text-gray-500 m-0 line-clamp-2">{item.message}</p>
+                            <p className="text-[10px] text-gray-400 mt-1">{dayjs(item.createdAt).fromNow()}</p>
+                          </div>
+                        }
+                      />
+                    </List.Item>
+                  )}
+                  locale={{ emptyText: <div className="py-10 text-center text-gray-400 italic">Chưa có thông báo nào</div> }}
+                />
+                <div className="mt-4 pt-4 border-t border-gray-100 text-center">
+                   <Link to="/profile/interviews" className="text-gray-500 text-xs font-bold hover:text-[#bc2228]">Xem tất cả hoạt động</Link>
+                </div>
+              </div>
+            }
+          >
+            <Badge count={unreadCount} overflowCount={99} size="small">
+              <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors">
+                <BellOutlined className="text-xl text-gray-600" />
+              </div>
+            </Badge>
+          </Popover>
+        )}
+
         <div className="flex items-center gap-2 pr-4 border-r border-gray-300">
           <img src={currentLanguage.icon} alt="VN" className="w-6 h-6 rounded-full" />
           <span className="text-gray-700 font-sf-pro-display">{currentLanguage.text}</span>

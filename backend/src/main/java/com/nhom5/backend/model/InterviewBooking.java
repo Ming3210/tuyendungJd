@@ -17,6 +17,7 @@ public class InterviewBooking {
     private String time;
     private String date;
     private Long userId;
+    private Long cvId;
     private String status;
     private String createAt;
     private String meetingLink;
@@ -38,7 +39,6 @@ public class InterviewBooking {
     @Convert(converter = JsonListConverter.class)
     private List<String> rank;
 
-    private String skills;
     private String province;
     private String district;
     private String address;
@@ -48,7 +48,6 @@ public class InterviewBooking {
     private List<String> benefitsDescription;
 
     private String workingTime;
-    private String skill;
     private String education;
 }
 

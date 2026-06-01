@@ -66,10 +66,10 @@ const InformationView: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="w-full">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900">Cập nhật thông tin cá nhân</h2>
-        <p className="text-gray-500">Quản lý thông tin hồ sơ để đảm bảo tài khoản</p>
+        <h2 className="text-2xl font-extrabold text-gray-900 m-0 leading-tight">Cập nhật thông tin cá nhân</h2>
+        <p className="text-gray-500 mt-1 text-sm">Quản lý thông tin hồ sơ để đảm bảo tài khoản</p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-12">
@@ -151,7 +151,7 @@ const InformationView: React.FC = () => {
             </Col>
           </Row>
 
-          {currentUser?.role === 'user' && (
+          {currentUser?.role === 'candidate' && (
             <>
               <Row gutter={24}>
                 <Col span={12}>

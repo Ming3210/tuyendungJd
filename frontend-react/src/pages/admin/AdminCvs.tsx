@@ -19,7 +19,7 @@ const AdminCvs: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchAllCvs({ page, limit: pageSize }));
-    dispatch(getAllUsers());
+    dispatch(getAllUsers({}));
   }, [dispatch, page, pageSize]);
 
   const mergedCvs = useMemo(() => {

@@ -2,23 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { message, Checkbox } from 'antd';
-import bcrypt from 'bcryptjs';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { getAllUsers, setCurrentUser } from '../../../store/slices/authSlice';
+import { loginUser } from '../../../store/slices/authSlice';
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { users } = useAppSelector((state) => state.auth);
+  const { loading } = useAppSelector((state) => state.auth);
 
   const [email, setEmail] = useState(localStorage.getItem('email') || '');
   const [password, setPassword] = useState(localStorage.getItem('password') || '');
   const [remember, setRemember] = useState(false);
-
-  useEffect(() => {
-    dispatch(getAllUsers());
-  }, [dispatch]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,47 +23,37 @@ const Login: React.FC = () => {
       return;
     }
 
-    const user = users.find((u: any) => u.email === email);
+    try {
+      const response = await dispatch(loginUser({ usernameOrEmail: email, password })).unwrap();
+      const user = response.user;
 
-    if (!user) {
-      message.error('Email không tồn tại');
-      return;
-    }
-
-    if (user.lock) {
-      message.error('Tài khoản của bạn đã bị khóa.');
-      return;
-    }
-
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      message.error('Mật khẩu không chính xác');
-      return;
-    }
-
-    if (remember) {
-      localStorage.setItem('email', email);
-      localStorage.setItem('password', password);
-    } else {
-      localStorage.removeItem('email');
-      localStorage.removeItem('password');
-    }
-
-    localStorage.setItem('token', user.id);
-    localStorage.setItem('role', user.role);
-
-    dispatch(setCurrentUser(user));
-    message.success('Đăng nhập thành công!');
-
-    if (user.role === 'admin') {
-      window.location.href = '/admin.html';
-    } else {
-      const redirect = searchParams.get('redirect');
-      if (redirect) {
-        navigate(decodeURIComponent(redirect));
-      } else {
-        navigate('/home-page');
+      if (user.lock) {
+        message.error('Tài khoản của bạn đã bị khóa.');
+        return;
       }
+
+      if (remember) {
+        localStorage.setItem('email', email);
+        localStorage.setItem('password', password);
+      } else {
+        localStorage.removeItem('email');
+        localStorage.removeItem('password');
+      }
+
+      message.success('Đăng nhập thành công!');
+
+      if (user.role === 'admin') {
+        window.location.href = '/admin.html';
+      } else {
+        const redirect = searchParams.get('redirect');
+        if (redirect) {
+          navigate(decodeURIComponent(redirect));
+        } else {
+          navigate('/home-page');
+        }
+      }
+    } catch (error: any) {
+      message.error(error.message || 'Sai tên đăng nhập hoặc mật khẩu!');
     }
   };
 
@@ -141,9 +126,10 @@ const Login: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full text-white py-2 rounded-md font-sf-pro-display bg-[#bc2228] hover:bg-red-700 transition duration-200 shadow-md"
+              disabled={loading}
+              className={`w-full text-white py-2 rounded-md font-sf-pro-display transition duration-200 shadow-md ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#bc2228] hover:bg-red-700'}`}
             >
-              Đăng nhập
+              {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </button>
           </form>
 

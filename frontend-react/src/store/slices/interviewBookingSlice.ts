@@ -52,6 +52,18 @@ export const fetchAllBookings = createAsyncThunk('interviewBooking/fetchAll', as
   };
 });
 
+export const fetchEnterpriseBookingsPaginated = createAsyncThunk(
+  'interviewBooking/fetchEnterprisePaginated', 
+  async ({ enterpriseId, status = 'all', page = 1, limit = 10 }: { enterpriseId: string | number; status?: string; page?: number; limit?: number }) => {
+  const response = await api.get(`/interview-bookings/enterprise/${enterpriseId}`, { params: { status, _page: page, _limit: limit } });
+  return {
+    bookings: response.data,
+    totalBookings: parseInt(response.headers['x-total-count'] || '0', 10),
+    page,
+    limit,
+  };
+});
+
 export const addBooking = createAsyncThunk('interviewBooking/add', async (payload: Partial<InterviewBooking>) => {
   const response = await api.post('/interview-bookings', payload);
   return response.data;
@@ -63,8 +75,8 @@ export const updateBooking = createAsyncThunk('interviewBooking/update', async (
 });
 
 export const deleteBooking = createAsyncThunk('interviewBooking/delete', async (id: string | number) => {
-  // await api.delete(`/interview-bookings/${id}`);
-  return id; // Simulation
+  await api.delete(`/interview-bookings/${id}`);
+  return id;
 });
 
 const interviewBookingSlice = createSlice({
@@ -90,6 +102,20 @@ const interviewBookingSlice = createSlice({
       .addCase(fetchAllBookings.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch bookings';
+      })
+      .addCase(fetchEnterpriseBookingsPaginated.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchEnterpriseBookingsPaginated.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bookings = action.payload.bookings;
+        state.totalBookings = action.payload.totalBookings;
+        state.currentPage = action.payload.page;
+        state.limit = action.payload.limit;
+      })
+      .addCase(fetchEnterpriseBookingsPaginated.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch enterprise bookings';
       })
       .addCase(addBooking.fulfilled, (state, action) => {
         state.bookings.push(action.payload);

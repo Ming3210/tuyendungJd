@@ -25,10 +25,11 @@ public class UserController {
             @RequestParam(name = "_page", defaultValue = "1") int page,
             @RequestParam(name = "_limit", defaultValue = "6") int limit,
             @RequestParam(name = "role", required = false) String role,
-            @RequestParam(name = "q", required = false) String q) {
+            @RequestParam(name = "q", required = false) String q,
+            @RequestParam(name = "_sort", required = false) String sort) {
 
         Pageable pageable = PageRequest.of(page - 1, limit);
-        Page<User> userPage = userService.getUsersPaginated(role, q, pageable);
+        Page<User> userPage = userService.getUsersPaginated(role, q, sort, pageable);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("x-total-count", String.valueOf(userPage.getTotalElements()));

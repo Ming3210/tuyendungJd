@@ -30,6 +30,12 @@ public class JWTAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        String uri = request.getRequestURI();
+        if (uri != null && uri.contains("/ws")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
             String token = getTokenFromRequest(request);
 

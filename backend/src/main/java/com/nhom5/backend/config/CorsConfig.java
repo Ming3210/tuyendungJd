@@ -18,6 +18,7 @@ public class CorsConfig {
         config.addAllowedOrigin("http://localhost:5175");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
+        config.addExposedHeader("x-total-count");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

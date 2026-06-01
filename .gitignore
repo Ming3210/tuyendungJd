@@ -1,0 +1,34 @@
+.env
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.iml
+
+# Node
+frontend-react/node_modules/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/dist/
+/build/
+
+# Java / Gradle
+.gradle/
+backend/build/
+**/build/
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs
+logs/
+*.log
+
+# OS files
+
+# Other
+out/

@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchJobsByEnterprise, clearCurrentJob } from '../../../store/slices/jobSlice';
 import { fetchEnterpriseById } from '../../../store/slices/enterpriseSlice';
+import { fetchSavedJobs, toggleSaveJob } from '../../../store/slices/userSlice';
 import {
   MapPin,
   Briefcase,
@@ -17,8 +18,10 @@ import {
   Award,
   CircleDollarSign
 } from 'lucide-react';
-import { Tag, Divider, Empty } from 'antd';
+import { Tag, Divider, Empty, message } from 'antd';
 import dayjs from 'dayjs';
+import { toggleFollow, checkFollowStatus } from '../../../store/slices/followSlice';
+import { Heart } from 'lucide-react';
 
 const CompanyDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,13 +30,48 @@ const CompanyDetail: React.FC = () => {
 
   const { currentEnterprise, loading: enterpriseLoading } = useAppSelector((state) => state.enterprise);
   const { jobs, loading: jobsLoading } = useAppSelector((state) => state.jobs);
+  const { currentUser } = useAppSelector((state) => state.auth);
+  const { followingIds } = useAppSelector((state) => state.follow);
+
+  const isFollowing = currentEnterprise ? followingIds[currentEnterprise.id] : false;
 
   useEffect(() => {
     if (id) {
       dispatch(fetchEnterpriseById(id));
-      dispatch(fetchJobsByEnterprise(id));
+      dispatch(fetchJobsByEnterprise({ enterpriseId: id }));
+      if (currentUser?.id) {
+        dispatch(checkFollowStatus({ userId: Number(currentUser.id), enterpriseId: Number(id) }));
+        dispatch(fetchSavedJobs(currentUser.id));
+      }
     }
-  }, [id, dispatch]);
+  }, [id, dispatch, currentUser?.id]);
+
+  const handleToggleSaveJob = async (e: React.MouseEvent, jobId: string | number) => {
+    e.stopPropagation();
+    if (!currentUser?.id) {
+      message.warning('Vui lòng đăng nhập để lưu việc làm');
+      navigate('/login');
+      return;
+    }
+    try {
+      await dispatch(toggleSaveJob({ userId: currentUser.id, jobId })).unwrap();
+    } catch (error) {
+      message.error('Có lỗi xảy ra, vui lòng thử lại');
+    }
+  };
+
+  const { savedJobs } = useAppSelector((state) => state.user);
+  const isJobSaved = (jobId: string | number) => savedJobs.some(sj => sj.jobId === jobId);
+
+  const handleFollowToggle = () => {
+    if (!currentUser) {
+      message.warning('Vui lòng đăng nhập để theo dõi công ty');
+      return;
+    }
+    if (id) {
+      dispatch(toggleFollow({ userId: Number(currentUser.id), enterpriseId: Number(id) }));
+    }
+  };
 
   const calculateDaysLeft = (deadline: string) => {
     if (!deadline) return 0;
@@ -86,6 +124,19 @@ const CompanyDetail: React.FC = () => {
               <div className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> {currentEnterprise.province}</div>
             </div>
           </div>
+
+          <div className="sm:ml-auto pb-4 sm:pb-6">
+            <button
+              onClick={handleFollowToggle}
+              className={`flex items-center gap-2 px-8 py-3 rounded-2xl font-bold transition-all transform hover:scale-105 active:scale-95 ${isFollowing
+                  ? 'bg-amber-500 text-white shadow-lg shadow-amber-200 ring-2 ring-amber-500 ring-offset-2 ring-offset-gray-800'
+                  : 'bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-md'
+                }`}
+            >
+              <Heart className={`w-5 h-5 ${isFollowing ? 'fill-current' : ''}`} />
+              {isFollowing ? 'Đang theo dõi' : 'Theo dõi công ty'}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -121,19 +172,42 @@ const CompanyDetail: React.FC = () => {
                   <div
                     key={job.id}
                     onClick={() => navigate(`/job-detail/${job.id}`)}
-                    className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-red-200 hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+                    className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-red-200 hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative"
                   >
                     <div className="flex-grow">
-                      <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#bc2228] transition-colors mb-2">{job.title}</h3>
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#bc2228] transition-colors">{job.title}</h3>
+                        <button
+                          onClick={(e) => handleToggleSaveJob(e, job.id)}
+                          className={`p-2 rounded-full transition-all border shadow-sm sm:hidden ${isJobSaved(job.id)
+                            ? 'bg-red-50 text-red-500 border-red-100'
+                            : 'hover:bg-red-50 text-gray-300 hover:text-red-500 border-transparent hover:border-red-100'
+                            }`}
+                        >
+                          <Heart className={`w-4 h-4 ${isJobSaved(job.id) ? 'fill-current' : ''}`} />
+                        </button>
+                      </div>
                       <div className="flex flex-wrap gap-4 text-sm text-gray-500 font-medium">
                         <span className="flex items-center gap-1.5 font-bold text-[#bc2228]"><CircleDollarSign className="w-4 h-4" /> {job.salary}</span>
                         <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> {job.province}</span>
                         <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> Còn {calculateDaysLeft(job.deadline)} ngày</span>
                       </div>
                     </div>
-                    <button className="px-6 py-2.5 bg-gray-50 group-hover:bg-[#bc2228] group-hover:text-white text-gray-700 rounded-xl font-bold transition-all text-sm whitespace-nowrap">
-                      Chi tiết
-                    </button>
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                      <button
+                        onClick={(e) => handleToggleSaveJob(e, job.id)}
+                        className={`hidden sm:flex p-2.5 rounded-xl transition-all border shadow-sm ${isJobSaved(job.id)
+                          ? 'bg-red-50 text-red-500 border-red-100'
+                          : 'bg-white text-gray-300 hover:text-red-500 hover:border-red-100 border-gray-100'
+                          }`}
+                        title={isJobSaved(job.id) ? "Bỏ lưu" : "Lưu việc làm"}
+                      >
+                        <Heart className={`w-5 h-5 ${isJobSaved(job.id) ? 'fill-current' : ''}`} />
+                      </button>
+                      <button className="flex-grow sm:flex-grow-0 px-6 py-2.5 bg-gray-50 group-hover:bg-[#bc2228] group-hover:text-white text-gray-700 rounded-xl font-bold transition-all text-sm whitespace-nowrap">
+                        Chi tiết
+                      </button>
+                    </div>
                   </div>
                 ))}
                 {jobs.length === 0 && (
@@ -147,7 +221,7 @@ const CompanyDetail: React.FC = () => {
           </div>
 
           {/* Right Column: Contact Info Sidebar */}
-          <div className="space-y-8">
+          <div className="space-y-8 lg:sticky lg:top-24 h-fit">
             <div className="bg-white rounded-3xl shadow-sm p-8 border border-gray-100/50">
               <h3 className="text-xl font-bold text-gray-900 mb-8 border-b pb-4">Thông tin liên hệ</h3>
 
@@ -214,9 +288,21 @@ const CompanyDetail: React.FC = () => {
 
               <div className="bg-gray-50 rounded-2xl p-6 text-center">
                 <p className="text-sm font-bold text-gray-900 mb-2">Bạn muốn gia nhập {currentEnterprise.title}?</p>
-                <p className="text-xs text-gray-500 mb-4">Khám phá và ứng tuyển ngay vào các vị trí phù hợp với năng lực của bạn.</p>
-                <div className="flex items-center justify-center gap-1.5 text-[#bc2228] font-bold text-sm cursor-default">
-                  <CheckCircle className="w-4 h-4" /> Top Employer
+                <p className="text-xs text-gray-500 mb-6">Khám phá và ứng tuyển ngay vào các vị trí phù hợp với năng lực của bạn.</p>
+                
+                <button
+                  onClick={handleFollowToggle}
+                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all mb-4 ${isFollowing
+                      ? 'bg-amber-100 text-amber-600 border border-amber-200'
+                      : 'bg-[#bc2228] text-white hover:bg-red-700 shadow-lg shadow-red-100'
+                    }`}
+                >
+                  <Heart className={`w-4 h-4 ${isFollowing ? 'fill-current' : ''}`} />
+                  {isFollowing ? 'Đang theo dõi' : 'Theo dõi ngay'}
+                </button>
+
+                <div className="flex items-center justify-center gap-1.5 text-gray-400 font-bold text-[10px] uppercase tracking-widest cursor-default">
+                  <CheckCircle className="w-3.5 h-3.5" /> Top Employer
                 </div>
               </div>
             </div>

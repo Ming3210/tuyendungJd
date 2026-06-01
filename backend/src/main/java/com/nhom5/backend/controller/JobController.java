@@ -27,15 +27,30 @@ public class JobController {
             @RequestParam(name = "industry", required = false) String industry,
             @RequestParam(name = "province", required = false) String province,
             @RequestParam(name = "flight", required = false) String flight,
-            @RequestParam(name = "enterpriseId", required = false) String enterpriseId,
+            @RequestParam(name = "enterpriseId", required = false) Long enterpriseId,
             @RequestParam(name = "title", required = false) String title,
+            @RequestParam(name = "experience", required = false) String experience,
+            @RequestParam(name = "saturdayOff", required = false) Boolean saturdayOff,
+            @RequestParam(name = "jobCategory", required = false) String jobCategory,
+            @RequestParam(name = "rank", required = false) String rank,
+            @RequestParam(name = "salaryMin", required = false) Double salaryMin,
+            @RequestParam(name = "salaryMax", required = false) Double salaryMax,
+            @RequestParam(name = "negotiable", required = false) Boolean negotiable,
+            @RequestParam(name = "jobLevel", required = false) String jobLevel,
+            @RequestParam(name = "education", required = false) String education,
+            @RequestParam(name = "searchMode", required = false) String searchMode,
             @RequestParam(name = "_sort", required = false) String sort) {
         
         boolean random = "random".equals(sort);
 
         // Standard Pagination (1-indexed to 0-indexed conversion)
         Pageable pageable = PageRequest.of(page - 1, limit);
-        Page<Job> jobPage = jobService.getJobsPaginated(flight, industry, province, enterpriseId, title, random, pageable);
+        Page<Job> jobPage = jobService.getJobsPaginated(
+            flight, industry, province, enterpriseId, title, 
+            experience, saturdayOff, jobCategory, null,
+            rank, salaryMin, salaryMax, negotiable,
+            jobLevel, education, searchMode,
+            random, pageable);
         
         HttpHeaders headers = new HttpHeaders();
         headers.add("x-total-count", String.valueOf(jobPage.getTotalElements()));
@@ -69,7 +84,6 @@ public class JobController {
             if (patch.getDescription() != null) existing.setDescription(patch.getDescription());
             if (patch.getRank() != null) existing.setRank(patch.getRank());
             if (patch.getGender() != null) existing.setGender(patch.getGender());
-            if (patch.getSkills() != null) existing.setSkills(patch.getSkills());
             if (patch.getSalaryCurrent() != null) existing.setSalaryCurrent(patch.getSalaryCurrent());
             if (patch.getSalary() != null) existing.setSalary(patch.getSalary());
             if (patch.getProvince() != null) existing.setProvince(patch.getProvince());
@@ -84,6 +98,12 @@ public class JobController {
             if (patch.getEnterpriseId() != null) existing.setEnterpriseId(patch.getEnterpriseId());
             if (patch.getFlight() != null) existing.setFlight(patch.getFlight());
             if (patch.getUpdateDate() != null) existing.setUpdateDate(patch.getUpdateDate());
+            if (patch.getSaturdayOff() != null) existing.setSaturdayOff(patch.getSaturdayOff());
+            if (patch.getMinSalary() != null) existing.setMinSalary(patch.getMinSalary());
+            if (patch.getMaxSalary() != null) existing.setMaxSalary(patch.getMaxSalary());
+            if (patch.getNegotiable() != null) existing.setNegotiable(patch.getNegotiable());
+            if (patch.getJobLevel() != null) existing.setJobLevel(patch.getJobLevel());
+            if (patch.getEducation() != null) existing.setEducation(patch.getEducation());
             
             return ResponseEntity.ok(jobService.createJob(existing));
         }).orElse(ResponseEntity.notFound().build());

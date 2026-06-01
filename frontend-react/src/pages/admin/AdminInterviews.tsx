@@ -28,7 +28,7 @@ const AdminInterviews: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchAllBookings({ page, limit: pageSize }));
-    dispatch(fetchAllJobs());
+    dispatch(fetchAllJobs({}));
     dispatch(fetchAllCandidates());
     dispatch(fetchAllEnterprises({ page: 1, limit: 1000 }));
   }, [dispatch, page, pageSize]);
@@ -127,48 +127,22 @@ const AdminInterviews: React.FC = () => {
       )
     },
     {
-      title: 'Thao tác Admin',
+      title: 'Hành động',
       key: 'actions',
-      render: (_: any, record: InterviewBooking) => (
-        <div className="flex gap-2">
-          {record.status === 'pending' && (
-            <>
-              <Button 
-                type="text" 
-                icon={<CheckCircleOutlined className="text-green-500" />} 
-                onClick={() => handleUpdateStatus(record.id, 'accepted')}
-                className="hover:bg-green-50"
-              />
-              <Button 
-                type="text" 
-                icon={<CloseCircleOutlined className="text-red-500" />} 
-                onClick={() => handleUpdateStatus(record.id, 'rejected')}
-                className="hover:bg-red-50"
-              />
-            </>
-          )}
-          <Select 
-            size="small" 
-            defaultValue={record.status} 
-            onChange={(val) => handleUpdateStatus(record.id, val)}
-            className="w-32"
-          >
-            <Option value="pending">Chờ xử lý</Option>
-            <Option value="accepted">Chấp nhận</Option>
-            <Option value="interviewing">Phỏng vấn</Option>
-            <Option value="completed">Hoàn thành</Option>
-            <Option value="rejected">Từ chối</Option>
-            <Option value="cancelled">Hủy bỏ</Option>
-          </Select>
-        </div>
+      render: () => (
+        <Tag color="default" className="rounded-full">Oversight Only</Tag>
       )
     }
   ];
 
   return (
     <div className="p-4 font-sf-pro-display">
+      <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl mb-6 text-blue-700 text-sm">
+        <strong>Lưu ý Admin:</strong> Quy trình tuyển dụng hiện đã được chuyển giao hoàn toàn cho Doanh nghiệp tự quản lý thông qua Pipeline. Bạn chỉ có quyền theo dõi tiến độ (Read-only).
+      </div>
+
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold m-0">Quản lý Ứng tuyển & Phỏng vấn</h1>
+        <h1 className="text-2xl font-bold m-0">Giám sát Tuyển dụng & Phỏng vấn</h1>
         <div className="flex gap-3">
           <Input
             placeholder="Tìm kiếm ứng viên hoặc công việc..."

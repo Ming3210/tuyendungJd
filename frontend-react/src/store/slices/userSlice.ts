@@ -21,6 +21,9 @@ export interface CV {
   pdfDataUrl: string;
   status: boolean;
   createAt?: string;
+  title?: string;
+  fileName?: string;
+  date?: string;
 }
 
 interface UserState {

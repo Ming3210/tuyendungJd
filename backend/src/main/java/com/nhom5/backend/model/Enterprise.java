@@ -1,10 +1,12 @@
 package com.nhom5.backend.model;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Table(name = "enterprises")
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Enterprise {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

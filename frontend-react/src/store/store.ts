@@ -9,6 +9,8 @@ import enterpriseReducer from './slices/enterpriseSlice'
 import candidateReducer from './slices/candidateSlice'
 import certificateTypeReducer from './slices/certificateTypeSlice'
 import vipReducer from './slices/vipSlice'
+import notificationReducer from './slices/notificationSlice'
+import followReducer from './slices/followSlice'
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +24,8 @@ export const store = configureStore({
     candidate: candidateReducer,
     certificateType: certificateTypeReducer,
     vip: vipReducer,
+    notification: notificationReducer,
+    follow: followReducer,
   },
 })
 

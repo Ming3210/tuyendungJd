@@ -5,9 +5,13 @@ interface User {
   id: string
   userName: string
   email: string
-  role: 'admin' | 'candidate' | 'enterprise'
+  role: 'admin' | 'candidate' | 'enterprise' | 'partner'
   lock: boolean
-  // Add other user fields as needed
+  avatar?: string
+  fullName?: string
+  password?: string
+  birthdate?: string
+  skills?: string
 }
 
 interface AuthState {
@@ -32,6 +36,11 @@ const initialState: AuthState = {
 }
 
 // Simulated Async Thunks (will be updated to use actual API later)
+export const loginUser = createAsyncThunk('auth/login', async (credentials: { usernameOrEmail: string; password: string }) => {
+  const response = await api.post('/api/auth/login', credentials)
+  return response.data // Should return { token, user }
+})
+
 export const getAllUsers = createAsyncThunk('auth/getAllUsers', async ({ page = 1, limit = 6, role = '', q = '' }: { page?: number; limit?: number; role?: string; q?: string } = {}) => {
   const response = await api.get('/users', {
     params: {
@@ -99,6 +108,20 @@ const authSlice = createSlice({
       .addCase(getAllUsers.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || 'Failed to fetch users'
+      })
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false
+        state.currentUser = action.payload.user
+        localStorage.setItem('token', action.payload.token)
+        localStorage.setItem('role', action.payload.user.role)
+        localStorage.setItem('currentUser', JSON.stringify(action.payload.user))
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || 'Login failed'
       })
       .addCase(updateProfile.fulfilled, (state, action) => {
         state.currentUser = action.payload

@@ -33,8 +33,11 @@
     "vite": "^8.0.4"
   },
   "dependencies": {
+    "@stomp/stompjs": "^7.3.0",
+    "framer-motion": "^12.38.0",
     "nprogress": "^0.2.0",
     "react": "^19.2.5",
-    "react-dom": "^19.2.5"
+    "react-dom": "^19.2.5",
+    "sockjs-client": "^1.6.1"
   }
 }

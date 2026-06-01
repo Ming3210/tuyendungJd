@@ -23,10 +23,12 @@ public class EnterpriseController {
     @GetMapping
     public ResponseEntity<List<Enterprise>> getAll(
             @RequestParam(name = "_page", defaultValue = "1") int page,
-            @RequestParam(name = "_limit", defaultValue = "6") int limit) {
+            @RequestParam(name = "_limit", defaultValue = "6") int limit,
+            @RequestParam(name = "industry", required = false) String industry,
+            @RequestParam(name = "_sort", required = false) String sort) {
         
         Pageable pageable = PageRequest.of(page - 1, limit);
-        Page<Enterprise> enterprisePage = enterpriseService.getEnterprisesPaginated(pageable);
+        Page<Enterprise> enterprisePage = enterpriseService.getEnterprisesPaginated(industry, sort, pageable);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("x-total-count", String.valueOf(enterprisePage.getTotalElements()));
@@ -67,6 +69,11 @@ public class EnterpriseController {
             if (patch.getAvatar() != null) existing.setAvatar(patch.getAvatar());
             return ResponseEntity.ok(enterpriseService.createEnterprise(existing));
         }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/ids")
+    public ResponseEntity<List<Enterprise>> getByIds(@RequestBody List<Long> ids) {
+        return ResponseEntity.ok(enterpriseService.getEnterprisesByIds(ids));
     }
 
     @DeleteMapping("/{id}")

@@ -1,81 +1,108 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchAllBookings, deleteBooking, InterviewBooking } from '../../store/slices/interviewBookingSlice';
+import { fetchEnterpriseBookingsPaginated, deleteBooking, InterviewBooking } from '../../store/slices/interviewBookingSlice';
 import { fetchAllCandidates } from '../../store/slices/candidateSlice';
 import { fetchJobsByEnterprise } from '../../store/slices/jobSlice';
 import { fetchAllCvs } from '../../store/slices/userSlice';
 import { viewDocument } from '../../utils/fileUtils';
-import { Pagination, Card, Button, Modal, message } from 'antd';
+import { Table, Button, Modal as AntdModal, App, Tag, Tooltip, Avatar, Space } from 'antd';
 import { 
   UserOutlined, 
   CalendarOutlined, 
   ClockCircleOutlined, 
   EnvironmentOutlined,
-  FileTextOutlined
+  FileTextOutlined,
+  SearchOutlined,
+  FilterOutlined,
+  EyeOutlined,
+  SettingOutlined,
+  DeleteOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import RecruitmentPipelineModal from '../../components/enterprise/RecruitmentPipelineModal';
+import { Input, Select, Empty } from 'antd';
+
+const { Option } = Select;
 
 const EnterpriseInterviewManager: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
+  const { message, modal } = App.useApp();
+  const [searchParams, setSearchParams] = useSearchParams();
   
-  const { bookings, loading } = useAppSelector((state) => state.interviewBooking);
+  const { bookings, loading, totalBookings, currentPage, limit } = useAppSelector((state) => state.interviewBooking);
   const { currentEnterprise } = useAppSelector((state) => state.enterprise);
   const { jobs } = useAppSelector((state) => state.jobs);
   const { candidates } = useAppSelector((state) => state.candidate);
   const { cvs } = useAppSelector((state) => state.user);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingBooking, setEditingBooking] = useState<InterviewBooking | null>(null);
+  
+  const [searchText, setSearchText] = useState('');
+  
+  const statusFilter = searchParams.get('status') || 'all';
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const pageSize = parseInt(searchParams.get('limit') || '10', 10);
 
   useEffect(() => {
-    dispatch(fetchAllBookings({ page: 1, limit: 1000 }));
+    if (id) {
+      dispatch(fetchEnterpriseBookingsPaginated({ enterpriseId: id, status: statusFilter, page: page, limit: pageSize }));
+    }
+  }, [dispatch, id, statusFilter, page, pageSize, isModalVisible]); // Re-fetch when modal closes just in case
+
+  useEffect(() => {
     dispatch(fetchAllCandidates());
     dispatch(fetchAllCvs({ page: 1, limit: 1000 }));
     if (id) {
-      dispatch(fetchJobsByEnterprise(id));
+      dispatch(fetchJobsByEnterprise({ enterpriseId: id, limit: 1000 }));
     }
   }, [dispatch, id]);
-
-  const enterpriseBookings = useMemo(() => {
-    return bookings.filter(b => String(b.enterpriseId) === String(id));
-  }, [bookings, id]);
-
-  const currentItems = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return enterpriseBookings.slice(start, start + itemsPerPage);
-  }, [enterpriseBookings, currentPage]);
 
   const findUserById = (userId: string | number) => {
     const candidate = candidates.find(c => String(c.id) === String(userId));
     return candidate ? candidate.fullName : "Chưa cập nhật tên";
   };
 
+  const getCandidateAvatar = (userId: string | number) => {
+     const candidate = candidates.find(c => String(c.id) === String(userId));
+     return candidate?.avatar;
+  }
+
   const findJobById = (jobId: string | number) => {
     const job = jobs.find(j => String(j.id) === String(jobId));
     return job ? job.title : "Chưa xác định tin tuyển dụng";
   };
 
-  const findCvForUser = (userId: string | number) => {
-    // Return active CV or first CV found for this user
-    const userCvs = cvs.filter(cv => String(cv.userId) === String(userId));
-    if (userCvs.length === 0) return null;
-    return userCvs.find(cv => cv.status === true) || userCvs[0];
+  const findCvById = (cvId: string | number) => {
+    return cvs.find(cv => String(cv.id) === String(cvId));
   };
 
+  // Local search filter
+  const filteredBookings = useMemo(() => {
+     if (!searchText) return bookings;
+     const lowerSearch = searchText.toLowerCase();
+     return bookings.filter(b => {
+        const candidateName = findUserById(b.userId).toLowerCase();
+        const jobTitle = findJobById(b.jobId).toLowerCase();
+        return candidateName.includes(lowerSearch) || jobTitle.includes(lowerSearch);
+     });
+  }, [bookings, searchText, candidates, jobs]);
+
   const handleDelete = (bookingId: string | number) => {
-    Modal.confirm({
+    modal.confirm({
       title: 'Xác nhận xóa',
-      content: 'Bạn có chắc chắn muốn xóa lịch phỏng vấn này?',
+      content: 'Bạn có chắc chắn muốn xóa hồ sơ ứng tuyển này?',
       okText: 'Xóa',
       okType: 'danger',
       cancelText: 'Hủy',
       onOk: () => {
-        dispatch(deleteBooking(bookingId));
-        message.success("Xóa lịch phỏng vấn thành công");
+        dispatch(deleteBooking(bookingId)).unwrap().then(() => {
+           message.success("Xóa hồ sơ thành công");
+           // Trigger refetch
+           dispatch(fetchEnterpriseBookingsPaginated({ enterpriseId: id!, status: statusFilter, page: page, limit: pageSize }));
+        });
       }
     });
   };
@@ -85,134 +112,173 @@ const EnterpriseInterviewManager: React.FC = () => {
     setIsModalVisible(true);
   };
 
-  return (
-    <div className="w-full">
-      <h2 className="text-2xl font-bold mb-6 text-gray-900 font-sf-pro-display">Quản lý lịch phỏng vấn</h2>
+  const handleFilterChange = (value: string) => {
+     const params = new URLSearchParams(searchParams);
+     params.set('status', value);
+     params.set('page', '1'); // Reset to page 1 on filter
+     setSearchParams(params);
+  };
 
-      <div className="bg-white rounded-xl min-h-[600px]">
-        {loading ? (
-          <div className="py-20 text-center text-gray-500">Đang tải lịch phỏng vấn...</div>
-        ) : enterpriseBookings.length === 0 ? (
-          <div className="py-20 text-center text-gray-500 italic">Không có lịch phỏng vấn nào.</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {currentItems.map((booking) => (
-              <Card 
-                key={booking.id} 
-                className="rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-                bodyStyle={{ padding: '20px' }}
-              >
-                <div className="flex items-start gap-4 mb-4">
-                  <img
-                    src={currentEnterprise?.avatar || 'https://via.placeholder.com/60'}
-                    alt="Company logo"
-                    className="w-[60px] h-[60px] rounded object-cover flex-shrink-0 border border-gray-100"
-                  />
-                  <div className="min-w-0">
-                    <p className="text-lg font-bold text-gray-900 font-sf-pro-display leading-tight truncate" title={findJobById(booking.jobId)}>
-                      {findJobById(booking.jobId)}
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1 truncate">
-                      {currentEnterprise?.title || "Công ty..."}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-3 font-sf-pro-display text-[15px] text-gray-700">
-                  <div className="flex items-center gap-3">
-                    <UserOutlined className="text-[#bc2228]" />
-                    <p><span className="font-semibold text-gray-900">Tên ứng viên:</span> {findUserById(booking.userId)}</p>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <FileTextOutlined className="text-[#bc2228] mt-1" />
-                    <div className="flex-1 min-w-0">
-                      <span className="font-semibold text-gray-900">CV: </span>
-                      {(() => {
-                        const cv = findCvForUser(booking.userId);
-                        if (!cv) return <span className="text-gray-400 italic">Chưa có CV</span>;
+  const tableColumns = [
+     {
+        title: 'Ứng viên',
+        key: 'candidate',
+        render: (_: any, record: InterviewBooking) => (
+           <div className="flex items-center gap-3">
+              <Avatar src={getCandidateAvatar(record.userId)} icon={<UserOutlined />} className="border border-gray-100" size="large" />
+              <div>
+                 <div className="font-bold text-gray-900">{findUserById(record.userId)}</div>
+                 <div className="text-xs text-gray-500 mt-1">
+                    {(() => {
+                        const cv = record.cvId ? findCvById(record.cvId) : null;
+                        if (!cv) return <span className="text-gray-400 italic">Không có CV đính kèm</span>;
                         return (
                           <button 
                             onClick={() => viewDocument(cv.pdfDataUrl)} 
-                            className="text-blue-600 hover:underline truncate inline-block max-w-full align-bottom border-none bg-transparent p-0 cursor-pointer text-left"
+                            className="text-[#bc2228] font-semibold hover:underline border-none bg-transparent p-0 cursor-pointer text-left flex items-center gap-1"
                           >
-                            {cv.title || 'cv_ung_vien.pdf'}
+                            <FileTextOutlined /> Xem hồ sơ
                           </button>
                         );
-                      })()}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <CalendarOutlined className="text-[#bc2228]" />
-                    <p><span className="font-semibold text-gray-900">Ngày:</span> {booking.date ? dayjs(booking.date).format('DD/MM/YYYY') : 'Chưa xếp lịch'}</p>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <ClockCircleOutlined className="text-[#bc2228]" />
-                    <p><span className="font-semibold text-gray-900">Thời gian:</span> {booking.time || 'Chưa xét thời gian'}</p>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <EnvironmentOutlined className="text-[#bc2228] mt-1" />
-                    <div className="flex-1 min-w-0">
-                      <span className="font-semibold text-gray-900 block sm:inline">Địa điểm: </span>
-                      {booking.meetingLink ? (
-                        <a href={booking.meetingLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate inline-block max-w-[200px] align-bottom">
-                          {booking.meetingLink}
-                        </a>
-                      ) : (
-                         <span className="text-gray-500 italic">Chưa có thông tin địa điểm</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-gray-100">
-                  <Button 
+                    })()}
+                 </div>
+              </div>
+           </div>
+        )
+     },
+     {
+        title: 'Vị trí ứng tuyển',
+        key: 'job',
+        render: (_: any, record: InterviewBooking) => (
+           <div>
+              <div className="font-semibold text-gray-800">{findJobById(record.jobId)}</div>
+              <div className="text-xs text-gray-500 mt-1">Ngày nộp: {dayjs(record.createAt).format('DD/MM/YYYY')}</div>
+           </div>
+        )
+     },
+     {
+        title: 'Trạng thái',
+        key: 'status',
+        render: (_: any, record: InterviewBooking) => {
+           let color = 'gold';
+           let text = 'Đang duyệt';
+           if (record.status === 'interviewing') { color = 'blue'; text = 'Phỏng vấn'; }
+           if (record.status === 'accepted') { color = 'green'; text = 'Trúng tuyển'; }
+           if (record.status === 'rejected') { color = 'red'; text = 'Từ chối'; }
+           if (record.status === 'cancelled') { color = 'default'; text = 'Đã hủy'; }
+           if (record.status === 'completed') { color = 'cyan'; text = 'Hoàn thành'; }
+           return <Tag color={color} className="uppercase font-bold border-none px-3 py-1 rounded-full">{text}</Tag>;
+        }
+     },
+     {
+        title: 'Lịch hẹn',
+        key: 'schedule',
+        render: (_: any, record: InterviewBooking) => {
+           if (!record.date) return <span className="text-gray-400 italic text-sm">Chưa có lịch</span>;
+           return (
+              <div className="text-sm font-medium text-gray-700">
+                 <div className="flex items-center gap-1"><CalendarOutlined className="text-gray-400"/> {dayjs(record.date).format('DD/MM/YYYY')}</div>
+                 <div className="flex items-center gap-1 mt-1"><ClockCircleOutlined className="text-gray-400"/> {record.time || 'N/A'}</div>
+              </div>
+           );
+        }
+     },
+     {
+        title: 'Thao tác',
+        key: 'actions',
+        align: 'right' as const,
+        render: (_: any, record: InterviewBooking) => (
+           <Space>
+              <Tooltip title="Xử lý hồ sơ">
+                 <Button 
                     type="primary" 
-                    className="w-full bg-[#bc2228] hover:bg-red-700 border-none font-medium font-sf-pro-display shadow-sm"
-                    onClick={() => handleEdit(booking)}
-                  >
-                    Chỉnh sửa
-                  </Button>
-                  <Button 
-                    variant="outlined" 
-                    className="w-full border-gray-200 text-gray-700 hover:text-[#bc2228] hover:border-[#bc2228] font-medium font-sf-pro-display"
-                    onClick={() => handleDelete(booking.id)}
-                  >
-                    Xóa
-                  </Button>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
+                    icon={<SettingOutlined />} 
+                    className="bg-[#bc2228] hover:bg-red-700 border-none shadow-sm rounded-lg"
+                    onClick={() => handleEdit(record)}
+                 >
+                    Xử lý
+                 </Button>
+              </Tooltip>
+              <Tooltip title={record.status === 'rejected' ? "Xóa hồ sơ" : "Chỉ được xóa khi đánh trượt"}>
+                 <Button 
+                    danger
+                    icon={<DeleteOutlined />} 
+                    className={`border-red-100 rounded-lg ${record.status === 'rejected' ? 'hover:bg-red-50' : 'opacity-50'}`}
+                    onClick={() => handleDelete(record.id)}
+                    disabled={record.status !== 'rejected'}
+                 />
+              </Tooltip>
+           </Space>
+        )
+     }
+  ];
 
-        {enterpriseBookings.length > itemsPerPage && (
-          <div className="mt-8 flex justify-end">
-             <Pagination 
-                current={currentPage} 
-                total={enterpriseBookings.length} 
-                pageSize={itemsPerPage} 
-                onChange={setCurrentPage} 
-                showSizeChanger={false}
-              />
+  return (
+    <div className="w-full">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div>
+             <h2 className="text-2xl font-extrabold text-gray-900 m-0">Quản lý Hồ sơ & Phỏng vấn</h2>
+             <p className="text-gray-500 mt-1 text-sm">Theo dõi và xử lý trạng thái ứng viên</p>
           </div>
-        )}
+          <div className="flex flex-wrap items-center gap-3">
+            <Input
+              placeholder="Tìm theo tên hoặc công việc..."
+              prefix={<SearchOutlined className="text-gray-400" />}
+              className="w-full md:w-64 h-10 rounded-xl"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              allowClear
+            />
+            <Select 
+              value={statusFilter} 
+              className="w-full md:w-44 h-10"
+              onChange={handleFilterChange}
+            >
+              <Option value="all">Tất cả trạng thái</Option>
+              <Option value="pending">Chờ xử lý</Option>
+              <Option value="interviewing">Đang phỏng vấn</Option>
+              <Option value="accepted">Trúng tuyển</Option>
+              <Option value="rejected">Từ chối</Option>
+              <Option value="completed">Hoàn thành</Option>
+              <Option value="cancelled">Đã hủy</Option>
+            </Select>
+          </div>
+        </div>
+
+        <div className="overflow-hidden rounded-xl border border-gray-100">
+          <Table
+             columns={tableColumns}
+             dataSource={filteredBookings}
+             rowKey="id"
+             loading={loading}
+             pagination={{
+                current: page,
+                pageSize: pageSize,
+                total: totalBookings,
+                showSizeChanger: true,
+                pageSizeOptions: ['5', '10', '20', '50'],
+                onChange: (newPage, newPageSize) => {
+                   const params = new URLSearchParams(searchParams);
+                   params.set('page', newPage.toString());
+                   params.set('limit', newPageSize.toString());
+                   setSearchParams(params);
+                }
+             }}
+             className="custom-entreprise-table shadow-none"
+             locale={{ emptyText: <Empty description="Không có dữ liệu hồ sơ phù hợp" /> }}
+          />
+        </div>
       </div>
 
-      <Modal
-        title={<span className="font-sf-pro-display text-xl font-bold">Chỉnh sửa lịch phỏng vấn</span>}
+      <RecruitmentPipelineModal
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
-        footer={null}
-        width={600}
-      >
-        <div className="py-10 text-center text-gray-500 font-sf-pro-display">
-           (Form chỉnh sửa lịch phỏng vấn sẽ được tích hợp ở đây)
-        </div>
-      </Modal>
+        booking={editingBooking ? bookings.find(b => b.id === editingBooking.id) || editingBooking : null}
+        candidateName={editingBooking ? findUserById(editingBooking.userId) : ''}
+        cvUrl={editingBooking?.cvId ? findCvById(editingBooking.cvId)?.pdfDataUrl : ''}
+        jobTitle={editingBooking ? findJobById(editingBooking.jobId) : ''}
+      />
 
     </div>
   );

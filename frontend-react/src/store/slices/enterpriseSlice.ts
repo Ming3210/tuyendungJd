@@ -39,20 +39,46 @@ const initialState: EnterpriseState = {
   limit: 8,
 };
 
-export const fetchAllEnterprises = createAsyncThunk('enterprise/fetchAll', async ({ page = 1, limit = 8 }: { page?: number; limit?: number } = {}) => {
-  const response = await api.get('/enterprises', { params: { _page: page, _limit: limit } });
-  return {
-    enterprises: response.data,
-    totalEnterprises: parseInt(response.headers['x-total-count'] || '0', 10),
-    page,
-    limit,
-  };
-});
+export const fetchAllEnterprises = createAsyncThunk(
+  'enterprise/fetchAll',
+  async ({ page = 1, limit = 8, industry = '', sort = '' }: { 
+    page?: number; 
+    limit?: number; 
+    industry?: string;
+    sort?: string;
+  } = {}) => {
+    // Artificial delay for testing skeleton loaders
+    await new Promise(resolve => setTimeout(resolve, 700));
+
+    const response = await api.get('/enterprises', { 
+      params: { 
+        _page: page, 
+        _limit: limit,
+        industry: industry || undefined,
+        _sort: sort || undefined
+      } 
+    });
+    return {
+      enterprises: response.data,
+      totalEnterprises: parseInt(response.headers['x-total-count'] || '0', 10),
+      page,
+      limit,
+    };
+  }
+);
 
 export const fetchEnterpriseById = createAsyncThunk('enterprise/fetchById', async (id: string | number) => {
   const response = await api.get(`/enterprises/${id}`);
   return response.data;
 });
+
+export const fetchEnterprisesByIds = createAsyncThunk(
+  'enterprise/fetchByIds',
+  async (ids: (string | number)[]) => {
+    const response = await api.post('/enterprises/ids', ids);
+    return response.data;
+  }
+);
 
 export const updateEnterpriseProfile = createAsyncThunk('enterprise/updateProfile', async (data: Enterprise) => {
   const response = await api.put(`/enterprises/${data.id}`, data);
@@ -110,6 +136,17 @@ const enterpriseSlice = createSlice({
       })
       .addCase(createEnterprise.fulfilled, (state, action) => {
         state.enterprises.unshift(action.payload);
+      })
+      .addCase(fetchEnterprisesByIds.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchEnterprisesByIds.fulfilled, (state, action) => {
+        state.loading = false;
+        state.enterprises = action.payload;
+      })
+      .addCase(fetchEnterprisesByIds.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch enterprises';
       });
   },
 });

@@ -24,31 +24,28 @@ import java.util.List;
 
 @Service
 public class UserDetailService implements UserDetailsService {
-    @Autowired
-    private UserRepository userRepository;
+        @Autowired
+        private UserRepository userRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-            User user = userRepository.findByUserNameOrEmail(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("Tài khoản không tồn tại"));
+        @Override
+        public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+                User user = userRepository.findByUserNameOrEmail(username)
+                                .orElseThrow(() -> new UsernameNotFoundException("Tài khoản không tồn tại"));
 
-        return UserPrincipal.builder()
-                .id(user.getId())
-                .username(user.getUserName())
-                .fullname(user.getFullName())
-                .password(user.getPassword())
-                .email(user.getEmail())
-                .phoneNumber(user.getPhone())
-                .role(user.getRole())
-                .status(user.getStatus())
-                .createdAt(user.getCreatedAt())
-                .updateAt(user.getUpdatedAt())
-                .authorities(Collections.singletonList(
-                        new SimpleGrantedAuthority("ROLE_" + user.getRole())
-                ))
-                .build();
+                return UserPrincipal.builder()
+                                .id(user.getId())
+                                .username(user.getUserName())
+                                .fullname(user.getFullName())
+                                .password(user.getPassword())
+                                .email(user.getEmail())
+                                .phoneNumber(user.getPhone())
+                                .role(user.getRole())
+                                .status(user.getStatus())
+                                .createdAt(user.getCreatedAt())
+                                .updateAt(user.getUpdatedAt())
+                                .authorities(Collections.singletonList(
+                                                new SimpleGrantedAuthority("ROLE_" + user.getRole())))
+                                .build();
 
-
-
-    }
+        }
 }

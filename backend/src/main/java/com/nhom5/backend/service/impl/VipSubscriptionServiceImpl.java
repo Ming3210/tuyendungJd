@@ -16,9 +16,8 @@ public class VipSubscriptionServiceImpl implements VipSubscriptionService {
     private VipSubscriptionRepository repository;
 
     private static final Map<String, Long> PLAN_PRICES = Map.of(
-            "pro", 99000L,
-            "business", 199000L
-    );
+            "pro", 1000L,
+            "business", 50000L);
 
     @Override
     public VipSubscription createSubscription(Long userId, String planType, int months) {

@@ -66,10 +66,10 @@ const InterviewView: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="w-full">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900">Lịch phỏng vấn</h2>
-        <p className="text-gray-500">Theo dõi lịch phỏng vấn và trạng thái ứng tuyển của bạn</p>
+        <h2 className="text-2xl font-extrabold text-gray-900 m-0 leading-tight">Lịch phỏng vấn</h2>
+        <p className="text-gray-500 mt-1 text-sm">Theo dõi lịch phỏng vấn và trạng thái ứng tuyển của bạn</p>
       </div>
 
       {loading ? (

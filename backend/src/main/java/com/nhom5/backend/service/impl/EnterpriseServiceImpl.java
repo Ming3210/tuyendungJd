@@ -23,8 +23,14 @@ public class EnterpriseServiceImpl implements EnterpriseService {
     }
 
     @Override
-    public Page<Enterprise> getEnterprisesPaginated(Pageable pageable) {
-        return enterpriseRepository.findAll(pageable);
+    public Page<Enterprise> getEnterprisesPaginated(String industry, String sort, Pageable pageable) {
+        String industryFilter = (industry == null || industry.isEmpty() || "Tất cả".equals(industry)) ? null : industry;
+        
+        if ("random".equals(sort)) {
+            return enterpriseRepository.findRandomEnterprisesPaginated(industryFilter, pageable);
+        }
+        
+        return enterpriseRepository.findEnterprisesFilteredPaginated(industryFilter, pageable);
     }
 
     @Override
@@ -62,6 +68,11 @@ public class EnterpriseServiceImpl implements EnterpriseService {
     @Override
     public List<Enterprise> getEnterprisesByUserId(Long userId) {
         return enterpriseRepository.findByUserId(userId);
+    }
+
+    @Override
+    public List<Enterprise> getEnterprisesByIds(List<Long> ids) {
+        return enterpriseRepository.findByIdIn(ids);
     }
 
     @Override

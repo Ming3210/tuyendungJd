@@ -54,7 +54,7 @@ const EnterpriseLayout: React.FC = () => {
           <div className="w-16 h-16 rounded-full border-4 border-gray-100 border-t-[#bc2228] animate-spin"></div>
           <Building2 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-red-100" />
         </div>
-        <p className="mt-6 text-gray-500 font-medium animate-pulse tracking-wide font-sf-pro-display">
+        <p className="mt-6 text-gray-500 font-bold animate-pulse tracking-wide">
           Đang chuẩn bị dữ liệu quản lý...
         </p>
       </div>
@@ -63,9 +63,9 @@ const EnterpriseLayout: React.FC = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row gap-8">
+      <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 py-8 flex flex-col xl:flex-row gap-8">
         {/* Sidebar */}
-        <div className="w-full md:w-80 shrink-0">
+        <div className="w-full xl:w-72 shrink-0">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
             <div className="flex items-center gap-4 mb-6">
               <img
@@ -74,10 +74,10 @@ const EnterpriseLayout: React.FC = () => {
                 className="w-12 h-12 rounded-full object-cover border border-gray-100"
               />
               <div className="overflow-hidden">
-                <h2 className="text-lg font-bold text-gray-900 truncate font-sf-pro-display">
+                <h2 className="text-lg font-extrabold text-gray-900 truncate">
                   {enterprise?.title || 'Doanh nghiệp'}
                 </h2>
-                <p className="text-gray-500 text-sm truncate font-sf-pro-display">{enterprise?.email}</p>
+                <p className="text-gray-400 text-xs truncate font-medium">{enterprise?.email}</p>
               </div>
             </div>
             
@@ -89,10 +89,10 @@ const EnterpriseLayout: React.FC = () => {
                   key={link.to}
                   to={link.to}
                   className={({ isActive }) => 
-                    `flex items-center gap-3 p-4 rounded-xl font-bold transition-all font-sf-pro-display ${
+                    `flex items-center gap-3 p-4 rounded-xl font-bold transition-all hover-lift ${
                       isActive 
-                      ? 'bg-[#fff6f7] text-[#bc2228] shadow-sm' 
-                      : 'text-gray-600 hover:bg-gray-50'
+                      ? 'bg-[#bc2228] text-white shadow-lg shadow-red-100' 
+                      : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                     }`
                   }
                 >
@@ -105,8 +105,8 @@ const EnterpriseLayout: React.FC = () => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-grow">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 min-h-[500px]">
+        <div className="flex-grow min-w-0">
+          <div className="min-h-[500px] page-slide-up">
             <Outlet />
           </div>
         </div>

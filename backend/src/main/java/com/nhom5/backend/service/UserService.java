@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface UserService {
     List<User> getAllUsers();
-    Page<User> getUsersPaginated(String role, String q, Pageable pageable);
+    Page<User> getUsersPaginated(String role, String q, String sort, Pageable pageable);
     Optional<User> getUserById(Long id);
     User createUser(User user);
     Optional<User> updateUser(Long id, User userDetails);

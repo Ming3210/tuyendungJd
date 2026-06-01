@@ -6,7 +6,7 @@ import { checkVipStatus } from '../../../store/slices/vipSlice';
 import { fetchUserCvs } from '../../../store/slices/userSlice';
 import { viewDocument } from '../../../utils/fileUtils';
 import { ArrowLeftOutlined, BookOutlined, UserOutlined } from '@ant-design/icons';
-import { GraduationCap, Languages, Eye, UserSearch } from 'lucide-react';
+import { GraduationCap, Languages, Eye, UserSearch, Lock } from 'lucide-react';
 import { Button, Card } from 'antd';
 import dayjs from 'dayjs';
 
@@ -65,7 +65,7 @@ const CandidateDetail: React.FC = () => {
   // Filter CVs: if viewing own profile show all, else show only active/approved CVs
   const displayCvs = cvs?.filter(cv => {
     if (String(currentUser?.id) === String(id)) return true;
-    return cv.status === true || cv.status === 'approved'; 
+    return cv.status === true; 
   }) || [];
 
   return (
@@ -178,7 +178,7 @@ const CandidateDetail: React.FC = () => {
                     >
                       Xem CV
                     </Button>
-                    {(!cv.status || cv.status === 'pending') && (
+                    {!cv.status && (
                       <span className="text-xs text-orange-500 font-medium">Chờ duyệt</span>
                     )}
                   </div>

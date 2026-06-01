@@ -24,7 +24,7 @@ public class InterviewBookingController {
     public ResponseEntity<List<InterviewBooking>> getAll(
             @RequestParam(name = "_page", defaultValue = "1") int page,
             @RequestParam(name = "_limit", defaultValue = "6") int limit) {
-        
+
         Pageable pageable = PageRequest.of(page - 1, limit);
         Page<InterviewBooking> ibPage = interviewBookingService.getInterviewBookingsPaginated(pageable);
 
@@ -36,13 +36,40 @@ public class InterviewBookingController {
     }
 
     @GetMapping("/user/{userId}")
-    public List<InterviewBooking> getByUserId(@PathVariable Long userId) {
-        return interviewBookingService.getByUserId(userId);
+    public ResponseEntity<List<InterviewBooking>> getByUserIdPaginated(
+            @PathVariable Long userId,
+            @RequestParam(name = "_page", required = false) Integer page,
+            @RequestParam(name = "_limit", required = false) Integer limit) {
+        
+        if (page != null && limit != null) {
+            Pageable pageable = PageRequest.of(page - 1, limit);
+            Page<InterviewBooking> ibPage = interviewBookingService.getByUserIdPaginated(userId, pageable);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("x-total-count", String.valueOf(ibPage.getTotalElements()));
+            headers.add("Access-Control-Expose-Headers", "x-total-count");
+            return ResponseEntity.ok().headers(headers).body(ibPage.getContent());
+        } else {
+            return ResponseEntity.ok(interviewBookingService.getByUserId(userId));
+        }
     }
 
     @GetMapping("/enterprise/{enterpriseId}")
-    public List<InterviewBooking> getByEnterpriseId(@PathVariable Long enterpriseId) {
-        return interviewBookingService.getByEnterpriseId(enterpriseId);
+    public ResponseEntity<List<InterviewBooking>> getByEnterpriseIdPaginated(
+            @PathVariable Long enterpriseId,
+            @RequestParam(name = "status", required = false, defaultValue = "all") String status,
+            @RequestParam(name = "_page", required = false) Integer page,
+            @RequestParam(name = "_limit", required = false) Integer limit) {
+        
+        if (page != null && limit != null) {
+            Pageable pageable = PageRequest.of(page - 1, limit);
+            Page<InterviewBooking> ibPage = interviewBookingService.getByEnterpriseIdPaginated(enterpriseId, status, pageable);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("x-total-count", String.valueOf(ibPage.getTotalElements()));
+            headers.add("Access-Control-Expose-Headers", "x-total-count");
+            return ResponseEntity.ok().headers(headers).body(ibPage.getContent());
+        } else {
+            return ResponseEntity.ok(interviewBookingService.getByEnterpriseId(enterpriseId));
+        }
     }
 
     @GetMapping("/{id}")
@@ -66,13 +93,9 @@ public class InterviewBookingController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<InterviewBooking> patch(@PathVariable Long id, @RequestBody InterviewBooking patch) {
-        return interviewBookingService.getInterviewBookingById(id).map(existing -> {
-            if (patch.getStatus() != null) existing.setStatus(patch.getStatus());
-            if (patch.getCancelReason() != null) existing.setCancelReason(patch.getCancelReason());
-            if (patch.getMeetingLink() != null) existing.setMeetingLink(patch.getMeetingLink());
-            if (patch.getUpdateStatusTime() != null) existing.setUpdateStatusTime(patch.getUpdateStatusTime());
-            return ResponseEntity.ok(interviewBookingService.createInterviewBooking(existing));
-        }).orElse(ResponseEntity.notFound().build());
+        return interviewBookingService.updateInterviewBooking(id, patch)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

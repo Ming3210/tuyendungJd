@@ -127,11 +127,11 @@ const CertificateView: React.FC = () => {
   ];
 
   return (
-    <div>
+    <div className="w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Danh sách chứng chỉ</h2>
-          <p className="text-gray-500">Hãy xem và cập nhật chứng chỉ của bạn</p>
+          <h2 className="text-2xl font-extrabold text-gray-900 m-0 leading-tight">Danh sách chứng chỉ</h2>
+          <p className="text-gray-500 mt-1 text-sm">Hãy xem và cập nhật chứng chỉ của bạn</p>
         </div>
         <Button 
           type="primary" 

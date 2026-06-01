@@ -1,5 +1,6 @@
 package com.nhom5.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.nhom5.backend.converter.JsonListConverter;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -28,7 +29,6 @@ public class Job {
     private List<String> rank;
 
     private String gender;
-    private String skills;
     private String salaryCurrent;
     private String salary;
     private String province;
@@ -51,8 +51,26 @@ public class Job {
     private List<String> required;
 
     private String industry;
-    private String enterpriseId;
+    private String jobCategory;
+
+    @Column(name = "enterprise_id")
+    private Long enterpriseId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "enterprise_id", insertable = false, updatable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Enterprise enterprise;
+
     private String flight;
+
+    private String experience;
+    private Boolean saturdayOff;
+    private Double minSalary;
+    private Double maxSalary;
+
+    private Boolean negotiable;
+    private String jobLevel;
+    private String education;
 
     private String updateDate;
 }

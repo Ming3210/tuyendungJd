@@ -10,7 +10,9 @@ public interface InterviewBookingService {
     List<InterviewBooking> getAllInterviewBookings();
     Page<InterviewBooking> getInterviewBookingsPaginated(Pageable pageable);
     List<InterviewBooking> getByUserId(Long userId);
+    Page<InterviewBooking> getByUserIdPaginated(Long userId, Pageable pageable);
     List<InterviewBooking> getByEnterpriseId(Long enterpriseId);
+    Page<InterviewBooking> getByEnterpriseIdPaginated(Long enterpriseId, String status, Pageable pageable);
     Optional<InterviewBooking> getInterviewBookingById(Long id);
     InterviewBooking createInterviewBooking(InterviewBooking interviewBooking);
     Optional<InterviewBooking> updateInterviewBooking(Long id, InterviewBooking details);

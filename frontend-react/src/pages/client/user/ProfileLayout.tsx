@@ -7,6 +7,7 @@ import {
   Award, 
   Calendar,
   Building2,
+  Users,
   Heart,
   Crown 
 } from 'lucide-react';
@@ -50,6 +51,12 @@ const ProfileLayout: React.FC = () => {
       show: currentUser.role !== 'partner'
     },
     {
+      to: '/profile/followed-companies',
+      icon: <Building2 className="w-5 h-5" />,
+      text: 'Công ty đang theo dõi',
+      show: currentUser.role !== 'partner'
+    },
+    {
       to: '/profile/enterprise',
       icon: <Building2 className="w-5 h-5" />,
       text: 'Quản lý doanh nghiệp',
@@ -59,10 +66,10 @@ const ProfileLayout: React.FC = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen page-entrance">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row gap-8">
+      <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 py-8 flex flex-col xl:flex-row gap-8">
         {/* Sidebar */}
-        <div className="w-full md:w-80 shrink-0">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="w-full xl:w-72 shrink-0">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
             <div className="flex items-center gap-4 mb-6">
               <img
                 src={currentUser.avatar || 'https://via.placeholder.com/48'}
@@ -71,14 +78,14 @@ const ProfileLayout: React.FC = () => {
               />
               <div className="overflow-hidden">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-gray-900 truncate">{currentUser.fullName}</h2>
+                  <h2 className="text-lg font-extrabold text-gray-900 truncate">{currentUser.fullName}</h2>
                   {isVip && (
                     <Tag color="gold" icon={<Crown className="w-3 h-3" />} className="m-0 text-[10px] font-bold uppercase flex items-center gap-1">
                       {planType}
                     </Tag>
                   )}
                 </div>
-                <p className="text-gray-500 text-sm truncate">{currentUser.email}</p>
+                <p className="text-gray-400 text-xs font-medium truncate">{currentUser.email}</p>
               </div>
             </div>
             
@@ -90,10 +97,10 @@ const ProfileLayout: React.FC = () => {
                   key={link.to}
                   to={link.to}
                   className={({ isActive }) => 
-                    `flex items-center gap-3 p-4 rounded-xl font-bold transition-all ${
+                    `flex items-center gap-3 p-4 rounded-xl font-bold transition-all hover-lift ${
                       isActive 
-                      ? 'bg-[#fff6f7] text-[#ab1f24] shadow-sm' 
-                      : 'text-gray-600 hover:bg-gray-50'
+                      ? 'bg-[#bc2228] text-white shadow-lg shadow-red-100' 
+                      : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                     }`
                   }
                 >
@@ -106,8 +113,8 @@ const ProfileLayout: React.FC = () => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-grow">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+        <div className="flex-grow min-w-0">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-10 page-slide-up">
             <Outlet />
           </div>
         </div>
