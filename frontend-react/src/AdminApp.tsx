@@ -10,7 +10,7 @@ import AdminLanguages from './pages/admin/AdminLanguages';
 import AdminUsers from './pages/admin/AdminUsers';
 
 // Mock components until we port them
-const Dashboard = () => <div><h2>Trang chủ Admin ^o^</h2><p>Chào mừng đến với trang quản trị.</p></div>;
+const Dashboard = () => <div><h2>Trang chủ Admin ^o^ </h2><p>Chào mừng đến với trang quản trị.</p></div>;
 
 const AdminApp: React.FC = () => {
   return (
