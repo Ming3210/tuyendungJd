@@ -1,16 +1,15 @@
-import { useEffect, useRef } from 'react';
-import { Client } from '@stomp/stompjs';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { addNotification } from '../store/slices/notificationSlice';
-import { notification } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import React from 'react';
 import {
+  BellFilled,
   CheckCircleFilled,
   ClockCircleFilled,
-  CloseCircleFilled,
-  BellFilled
+  CloseCircleFilled
 } from '@ant-design/icons';
+import { Client } from '@stomp/stompjs';
+import { notification } from 'antd';
+import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { addNotification } from '../store/slices/notificationSlice';
 
 const NOTIFICATION_SOUND_URL = 'https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3';
 
@@ -35,7 +34,7 @@ const useWebSocket = () => {
     }
 
     const client = new Client({
-      brokerURL: 'ws://localhost:8080/ws',
+      brokerURL: 'ws://tuyendungjob.duckdns.org:8080/ws',
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,

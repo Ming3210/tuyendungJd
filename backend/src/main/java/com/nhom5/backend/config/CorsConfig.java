@@ -16,6 +16,7 @@ public class CorsConfig {
         config.addAllowedOrigin("http://localhost:5173");
         config.addAllowedOrigin("http://localhost:5174");
         config.addAllowedOrigin("http://localhost:5175");
+        config.addAllowedOrigin("http://tuyendungjob.duckdns.org");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.addExposedHeader("x-total-count");

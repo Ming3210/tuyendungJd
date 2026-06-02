@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
 
 export interface Certificate {
@@ -98,8 +98,8 @@ export const fetchAllCvs = createAsyncThunk('user/fetchAllCvs', async ({ page = 
 });
 
 export const updateCvStatus = createAsyncThunk('user/updateCvStatus', async ({ id, status }: { id: string | number; status: boolean }) => {
-  // await api.put(`/cvs/${id}/status`, { status });
-  return { id, status }; // Simulation
+  const response = await api.patch(`/cvs/${id}`, { status });
+  return response.data;
 });
 
 export const fetchSavedJobs = createAsyncThunk('user/fetchSavedJobs', async (userId: string | number) => {
