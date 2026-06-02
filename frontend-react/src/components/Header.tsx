@@ -1,20 +1,21 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  DownOutlined, 
-  HeartOutlined, 
-  LogoutOutlined, 
-  SearchOutlined,
-  BellOutlined
+import {
+  BellOutlined,
+  ClockCircleOutlined,
+  CrownOutlined,
+  DownOutlined,
+  HeartOutlined,
+  LogoutOutlined,
+  SearchOutlined
 } from '@ant-design/icons';
-import { Dropdown, Menu, Modal, message, Tag, Badge, Popover, List, Typography, Avatar } from 'antd';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { logout } from '../store/slices/authSlice';
-import { checkVipStatus } from '../store/slices/vipSlice';
-import { fetchNotifications, markAsRead, markAllAsRead } from '../store/slices/notificationSlice';
-import { CrownOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { Avatar, Badge, Dropdown, List, message, Modal, Popover, Tag, Typography } from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { logout } from '../store/slices/authSlice';
+import { fetchNotifications, markAllAsRead, markAsRead } from '../store/slices/notificationSlice';
+import { checkVipStatus } from '../store/slices/vipSlice';
 
 // Initialize relativeTime plugin
 dayjs.extend(relativeTime);
@@ -167,9 +168,11 @@ const Header: React.FC = () => {
           <Link to="/contact" className="font-sf-pro-display text-black hover:text-[#bc2228]">
             Liên hệ
           </Link>
-          <Link to="/pricing" className="font-sf-pro-display text-[#bc2228] font-bold flex items-center gap-1 hover:opacity-80">
-            <CrownOutlined /> Nâng cấp VIP
-          </Link>
+          {!isVip && (
+            <Link to="/pricing" className="font-sf-pro-display text-[#bc2228] font-bold flex items-center gap-1 hover:opacity-80">
+              <CrownOutlined /> Nâng cấp VIP
+            </Link>
+          )}
         </nav>
       </div>
 

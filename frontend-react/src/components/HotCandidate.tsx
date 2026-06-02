@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo } from 'react';
+import dayjs from 'dayjs';
+import { ChevronRight, Crown, GraduationCap, Languages, Lock } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { fetchCandidatesPaginated } from '../store/slices/candidateSlice';
-import { Link, useNavigate } from 'react-router-dom';
-import { ChevronRight, Crown, GraduationCap, Languages, Lock, User } from 'lucide-react';
-import dayjs from 'dayjs';
 import { checkVipStatus } from '../store/slices/vipSlice';
 
 const HotCandidate: React.FC = () => {
@@ -96,7 +96,7 @@ const HotCandidate: React.FC = () => {
             <p className="text-gray-500 mt-1">Gặp gỡ những tài năng hàng đầu trong mạng lưới của chúng tôi</p>
           </div>
           <Link
-            to="/all-candidates"
+            to={isPremiumUser ? '/all-candidates' : '/pricing?plan=pro'}
             className="flex items-center gap-1 text-[#bc2228] font-bold hover:gap-2 transition-all"
           >
             {isPremiumUser ? 'Xem tất cả' : 'Nâng cấp ngay'} <ChevronRight className="w-4 h-4" />

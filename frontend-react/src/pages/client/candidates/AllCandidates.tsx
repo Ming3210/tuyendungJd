@@ -1,22 +1,22 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { fetchCandidatesPaginated } from '../../../store/slices/candidateSlice';
-import { checkVipStatus } from '../../../store/slices/vipSlice';
-import { useNavigate } from 'react-router-dom';
 import { Pagination } from 'antd';
 import dayjs from 'dayjs';
 import {
-  Users,
-  Crown,
-  Lock,
-  Search,
-  SlidersHorizontal,
-  ChevronDown,
-  GraduationCap,
-  Languages,
-  Sparkles,
-  Eye,
+    ChevronDown,
+    Crown,
+    Eye,
+    GraduationCap,
+    Languages,
+    Lock,
+    Search,
+    SlidersHorizontal,
+    Sparkles,
+    Users,
 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { fetchCandidatesPaginated } from '../../../store/slices/candidateSlice';
+import { checkVipStatus } from '../../../store/slices/vipSlice';
 
 const AllCandidates: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -75,7 +75,7 @@ const AllCandidates: React.FC = () => {
 
   const handleClick = (id: string | number) => {
     if (!isPremiumUser) return;
-    navigate(`/homepage/candidate/candidateDetail/${id}`);
+    navigate(`/candidate-detail/${id}`);
   };
 
   return (
