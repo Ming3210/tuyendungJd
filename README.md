@@ -1,13 +1,13 @@
 # tuyendungJd
 
 ![GitHub stars](https://img.shields.io/github/stars/Ming3210/tuyendungJd?style=for-the-badge&logo=github) ![GitHub forks](https://img.shields.io/github/forks/Ming3210/tuyendungJd?style=for-the-badge&logo=github) ![GitHub issues](https://img.shields.io/github/issues/Ming3210/tuyendungJd?style=for-the-badge&logo=github) ![Last commit](https://img.shields.io/github/last-commit/Ming3210/tuyendungJd?style=for-the-badge&logo=github) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) ![Java (Gradle)](https://img.shields.io/badge/Java%20(Gradle)-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white) ![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-
-## 📑 Table of Contents
  <h1>Admin acc: admin@gmail.com</h1>
  <h1>Partner acc: em@gmail.com</h1>
  <h1>Partner acc: phuong@gmail.com</h1>
  <h1>Partner acc: phuc@gmail.com</h1>
  <h1>Pass: 123456</h1>
+## 📑 Table of Contents
+
 - [Description](#description)
 - [Tech Stack](#tech-stack)
 - [Quick Start](#quick-start)
