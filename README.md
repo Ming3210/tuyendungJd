@@ -1,183 +1,280 @@
-<p align="center">
-  <h1>tuyendungJd</h1>
-  <h3>🚀 Streamlining the recruitment process with a robust, full-stack job management platform.</h3>
-  <p align="center">
-    <img alt="Build Status" src="https://img.shields.io/badge/build-passing-brightgreen" />
-    <img alt="License" src="https://img.shields.io/badge/license-MIT-blue" />
-    <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" />
-    <img alt="GitHub Stars" src="https://img.shields.io/github/stars/tuyendungJd/tuyendungJd?style=social" />
-  </p>
-</p>
+# tuyendungJd
 
----
+![GitHub stars](https://img.shields.io/github/stars/Ming3210/tuyendungJd?style=for-the-badge&logo=github) ![GitHub forks](https://img.shields.io/github/forks/Ming3210/tuyendungJd?style=for-the-badge&logo=github) ![GitHub issues](https://img.shields.io/github/issues/Ming3210/tuyendungJd?style=for-the-badge&logo=github) ![Last commit](https://img.shields.io/github/last-commit/Ming3210/tuyendungJd?style=for-the-badge&logo=github) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) ![Java (Gradle)](https://img.shields.io/badge/Java%20(Gradle)-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white) ![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+
+## 📑 Table of Contents
  <h1>Admin acc: admin@gmail.com</h1>
  <h1>Partner acc: em@gmail.com</h1>
  <h1>Partner acc: phuong@gmail.com</h1>
  <h1>Partner acc: phuc@gmail.com</h1>
  <h1>Pass: 123456</h1>
- 
-## The Strategic "Why"
+- [Description](#description)
+- [Tech Stack](#tech-stack)
+- [Quick Start](#quick-start)
+- [Key Dependencies](#key-dependencies)
+- [Available Scripts](#available-scripts)
+- [Project Structure](#project-structure)
+- [Development Setup](#development-setup)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
 
-> The modern recruitment landscape is fraught with inefficiencies: manual job description management, disjointed applicant tracking, and a lack of centralized data lead to wasted time, increased costs, and missed opportunities to secure top talent. Without a unified, scalable solution, organizations struggle to maintain consistency and agility in their hiring efforts.
+## 📝 Description
 
-`tuyendungJd` addresses these critical pain points by providing a comprehensive, containerized platform for managing job descriptions and streamlining the recruitment workflow. By centralizing data, automating key processes, and offering a highly responsive user experience, `tuyendungJd` empowers hiring teams to operate with unparalleled efficiency, focus on strategic talent acquisition, and ultimately, make better hiring decisions faster.
+tuyendungJd — a frontend web app built with Docker, Java (Gradle), React, Tailwind CSS, TypeScript, Vite.
 
----
+## 🛠️ Tech Stack
 
-## Key Features
+- 🐳 **Docker**
+- ☕ **Java (Gradle)**
+- ⚛️ **React**
+- 🌬️ **Tailwind CSS**
+- 📘 **TypeScript**
+- ⚡ **Vite**
 
-`tuyendungJd` is engineered to empower your recruitment efforts with a suite of powerful features:
+**Notable libraries:** Framer Motion, Redux
 
-*   ✍️ **Intuitive Job Description Management**: Create, edit, and publish detailed job descriptions with rich text formatting and version control, ensuring consistency and accuracy across all postings.
-*   📊 **Centralized Data Repository**: Securely store all job-related data, including requirements, responsibilities, and benefits, in a single, accessible location for easy retrieval and analysis.
-*   ⚙️ **Robust Backend APIs**: Leverage powerful, well-documented RESTful APIs built with TypeScript for seamless integration with other HR systems and custom application development.
-*   📱 **Responsive Frontend Experience**: A modern, performant React frontend delivers an exceptional user experience across all devices, ensuring accessibility and ease of use for hiring managers and candidates alike.
-*   🐳 **Containerized Deployment**: Achieve consistent, scalable, and isolated deployments across any environment thanks to Docker and Docker Compose, simplifying setup and maintenance.
-*   🔒 **Secure & Scalable Architecture**: Built with best practices in mind, `tuyendungJd` offers a secure foundation that can scale with your organization's growing recruitment needs.
+## ⚡ Quick Start
 
----
+```bash
 
-## Technical Architecture
+# 1. Clone the repository
+git clone https://github.com/Ming3210/tuyendungJd.git
 
-`tuyendungJd` leverages a modern, containerized architecture to deliver a robust and scalable solution.
+# 2. Install dependencies
+npm install
 
-### Tech Stack
-
-| Technology      | Purpose                                    | Key Benefit                                  |
-| :-------------- | :----------------------------------------- | :------------------------------------------- |
-| **TypeScript**  | Primary language for frontend and backend  | Enhanced code quality, maintainability, scalability |
-| **React**       | Frontend framework for user interface      | Component-based, declarative UI, high performance |
-| **Node.js**     | Backend runtime environment                | Asynchronous, event-driven, efficient I/O    |
-| **Express.js**  | Backend web application framework          | Fast, unopinionated, flexible API development |
-| **Docker**      | Containerization platform                  | Environment consistency, isolation, portability |
-| **Docker Compose** | Orchestration for multi-container apps     | Simplified development and deployment workflows |
-
-### Directory Structure
-
-```
-📁 tuyendungJd/
-├── 📁 .idea/                            # IDE configuration files
-├── 📁 .vscode/                          # VS Code editor settings
-├── 📁 backend/                          # Backend service (Node.js, Express, TypeScript)
-│   ├── 📁 src/                          # Source code for the backend
-│   │   ├── 📄 app.ts                    # Main application entry point
-│   │   ├── 📁 controllers/              # Request handlers
-│   │   ├── 📁 models/                   # Database models
-│   │   ├── 📁 routes/                   # API routes definitions
-│   │   └── 📁 services/                 # Business logic
-│   ├── 📄 package.json                  # Backend dependencies
-│   ├── 📄 tsconfig.json                 # TypeScript configuration for backend
-│   └── 📄 Dockerfile                    # Dockerfile for backend service
-├── 📁 frontend-react/                   # Frontend application (React, TypeScript)
-│   ├── 📁 public/                       # Static assets
-│   ├── 📁 src/                          # Source code for the frontend
-│   │   ├── 📁 components/               # Reusable UI components
-│   │   ├── 📁 pages/                    # Application pages
-│   │   ├── 📁 services/                 # API interaction services
-│   │   ├── 📄 index.tsx                 # Main React entry point
-│   │   └── 📄 App.tsx                   # Main application component
-│   ├── 📄 package.json                  # Frontend dependencies
-│   ├── 📄 tsconfig.json                 # TypeScript configuration for frontend
-│   └── 📄 Dockerfile                    # Dockerfile for frontend service
-├── 📄 docker-compose.yml                # Docker Compose configuration for multi-service setup
-├── 📄 package-lock.json                 # Project-level dependency lock file
-└── 📄 README.md                         # Project documentation
+# 3. Start the dev server
+npm run dev
 ```
 
+## 📦 Key Dependencies
+
+```
+@stomp/stompjs: ^7.3.0
+framer-motion: ^12.38.0
+nprogress: ^0.2.0
+react: ^19.2.5
+react-dom: ^19.2.5
+sockjs-client: ^1.6.1
+```
+
+## 🚀 Available Scripts
+
+- **dev** — `npm run dev`
+- **build** — `npm run build`
+- **preview** — `npm run preview`
+
+## 📁 Project Structure
+
+```
+.
+├── backend
+│   ├── Dockerfile
+│   ├── build.gradle
+│   ├── gradle
+│   │   └── wrapper
+│   │       ├── gradle-wrapper.jar
+│   │       └── gradle-wrapper.properties
+│   ├── gradle.properties
+│   ├── gradlew.bat
+│   ├── settings.gradle
+│   └── src
+│       └── main
+│           ├── java
+│           │   └── com
+│           │       └── ...
+│           └── resources
+│               ├── application.properties
+│               ├── data.sql
+│               └── data_master.sql
+├── docker-compose.yml
+└── frontend-react
+    ├── Dockerfile
+    ├── admin.html
+    ├── index.html
+    ├── nginx.conf
+    ├── package.json
+    ├── public
+    │   ├── favicon.svg
+    │   └── icons.svg
+    ├── src
+    │   ├── AdminApp.tsx
+    │   ├── App.tsx
+    │   ├── admin
+    │   │   └── layouts
+    │   │       └── AdminLayout.tsx
+    │   ├── admin.tsx
+    │   ├── assets
+    │   │   ├── 1.png
+    │   │   ├── banner
+    │   │   │   ├── banner_img.svg
+    │   │   │   ├── decor1.svg
+    │   │   │   ├── decor2.svg
+    │   │   │   ├── decor3.svg
+    │   │   │   └── decor4.svg
+    │   │   ├── base.css
+    │   │   ├── decor.svg
+    │   │   ├── decorJob.svg
+    │   │   ├── desktop.ini
+    │   │   ├── enterprise_discovery_hero.png
+    │   │   ├── error
+    │   │   │   ├── 403.png
+    │   │   │   └── 404.png
+    │   │   ├── font
+    │   │   │   └── font.css
+    │   │   ├── hero.png
+    │   │   ├── icons
+    │   │   │   ├── Featured icon1.png
+    │   │   │   ├── Featured icon2.png
+    │   │   │   ├── Featured icon3.png
+    │   │   │   ├── Featured icon4.png
+    │   │   │   ├── building.png
+    │   │   │   ├── calendar.png
+    │   │   │   ├── document.png
+    │   │   │   ├── facebook.png
+    │   │   │   ├── icon 1.png
+    │   │   │   ├── lock.png
+    │   │   │   ├── note.png
+    │   │   │   ├── personal-card.png
+    │   │   │   ├── trash.png
+    │   │   │   └── youtube.png
+    │   │   ├── img
+    │   │   │   ├── Logo2.png
+    │   │   │   ├── VN.png
+    │   │   │   ├── us.svg
+    │   │   │   └── vn.svg
+    │   │   ├── jobs.svg
+    │   │   ├── logo.svg
+    │   │   ├── main.css
+    │   │   ├── rikkei.svg
+    │   │   ├── rk
+    │   │   │   ├── dc.svg
+    │   │   │   └── rk.svg
+    │   │   ├── typescript.svg
+    │   │   └── vite.svg
+    │   ├── components
+    │   │   ├── Banner.tsx
+    │   │   ├── Footer.tsx
+    │   │   ├── Header.tsx
+    │   │   ├── HotCandidate.tsx
+    │   │   ├── HotEnterprise.tsx
+    │   │   ├── HotJob.tsx
+    │   │   ├── JobFilterSidebar.tsx
+    │   │   ├── JobSearchBar.tsx
+    │   │   ├── OutstandingNumbers.tsx
+    │   │   ├── common
+    │   │   │   ├── DisclaimerModal.tsx
+    │   │   │   ├── PageLoader.tsx
+    │   │   │   └── ScrollToTop.tsx
+    │   │   ├── enterprise
+    │   │   │   ├── RecruitmentPipelineModal.tsx
+    │   │   │   └── RegisterEnterpriseModal.tsx
+    │   │   ├── errors
+    │   │   │   ├── Error403.tsx
+    │   │   │   └── Error404.tsx
+    │   │   └── jobs
+    │   │       └── ApplyJobModal.tsx
+    │   ├── hooks
+    │   │   └── useWebSocket.tsx
+    │   ├── index.css
+    │   ├── layouts
+    │   │   └── MainLayout.tsx
+    │   ├── main.tsx
+    │   ├── pages
+    │   │   ├── admin
+    │   │   │   ├── AdminCertificates.tsx
+    │   │   │   ├── AdminCvs.tsx
+    │   │   │   ├── AdminEnterprises.tsx
+    │   │   │   ├── AdminInterviews.tsx
+    │   │   │   ├── AdminJobs.tsx
+    │   │   │   ├── AdminLanguages.tsx
+    │   │   │   └── AdminUsers.tsx
+    │   │   ├── client
+    │   │   │   ├── auth
+    │   │   │   │   └── ...
+    │   │   │   ├── candidates
+    │   │   │   │   └── ...
+    │   │   │   ├── enterprise
+    │   │   │   │   └── ...
+    │   │   │   ├── home
+    │   │   │   │   └── ...
+    │   │   │   ├── jobs
+    │   │   │   │   └── ...
+    │   │   │   ├── misc
+    │   │   │   │   └── ...
+    │   │   │   └── user
+    │   │   │       └── ...
+    │   │   └── enterprise
+    │   │       ├── ApplicantsModal.tsx
+    │   │       ├── EnterpriseDetail.tsx
+    │   │       ├── EnterpriseInterviewManager.tsx
+    │   │       ├── EnterpriseJobManager.tsx
+    │   │       └── EnterpriseLayout.tsx
+    │   ├── services
+    │   │   └── api.ts
+    │   ├── store
+    │   │   ├── hooks.ts
+    │   │   ├── slices
+    │   │   │   ├── authSlice.ts
+    │   │   │   ├── candidateSlice.ts
+    │   │   │   ├── certificateTypeSlice.ts
+    │   │   │   ├── cvLanguageSlice.ts
+    │   │   │   ├── enterpriseSlice.ts
+    │   │   │   ├── followSlice.ts
+    │   │   │   ├── interviewBookingSlice.ts
+    │   │   │   ├── jobSlice.ts
+    │   │   │   ├── notificationSlice.ts
+    │   │   │   ├── provinceSlice.ts
+    │   │   │   ├── userSlice.ts
+    │   │   │   └── vipSlice.ts
+    │   │   └── store.ts
+    │   ├── style.css
+    │   └── utils
+    │       └── fileUtils.ts
+    ├── tailwind.config.ts
+    ├── tsconfig.json
+    ├── tsconfig.node.json
+    └── vite.config.ts
+```
+
+## 🛠️ Development Setup
+
+### Node.js / JavaScript
+1. Install Node.js (v18+ recommended)
+2. Install dependencies: `npm install` (or `yarn` / `pnpm install` / `bun install`)
+3. Start the dev server: see the **Quick Start** above
+
+### Docker
+1. `docker build -t my-app .`
+2. `docker run -p 3000:3000 my-app`
+
+## 🚢 Deployment
+
+### Docker
+```bash
+docker build -t tuyendungjd .
+docker run -p 3000:3000 tuyendungjd
+```
+
+### Docker Compose
+```bash
+docker compose up -d
+```
+
+> ⚙️ CI/CD is configured via GitHub Actions (see `.github/workflows/`).
+
+## 👥 Contributing
+
+Contributions are welcome! Here's the standard flow:
+
+1. **Fork** the repository
+2. **Clone** your fork: `git clone https://github.com/Ming3210/tuyendungJd.git`
+3. **Branch**: `git checkout -b feature/your-feature`
+4. **Commit**: `git commit -m 'feat: add some feature'`
+5. **Push**: `git push origin feature/your-feature`
+6. **Open** a pull request
+
+Please follow the existing code style and include tests for new behavior where applicable.
+
 ---
-
-## Operational Setup
-
-Follow these instructions to get `tuyendungJd` up and running on your local machine.
-
-### Prerequisites
-
-Ensure you have the following installed on your system:
-
-*   **Node.js**: Version 18.x or higher (for development outside Docker, or for running scripts)
-*   **npm** or **Yarn**: Package manager for Node.js
-*   **Docker**: Latest stable version
-*   **Docker Compose**: Latest stable version (usually bundled with Docker Desktop)
-
-### Installation
-
-1.  **Clone the Repository**:
-    ```bash
-    git clone https://github.com/tuyendungJd/tuyendungJd.git
-    cd tuyendungJd
-    ```
-
-2.  **Configure Environment Variables**:
-    Create `.env` files for both the `backend` and `frontend-react` directories based on example files (if provided, otherwise create them manually):
-
-    **`backend/.env`**:
-    ```ini
-    PORT=5000
-    DATABASE_URL="postgresql://user:password@db:5432/tuyendungjd"
-    # Add other backend-specific variables like JWT secrets, API keys, etc.
-    ```
-
-    **`frontend-react/.env`**:
-    ```ini
-    REACT_APP_API_BASE_URL="http://localhost:5000/api"
-    # Add other frontend-specific variables
-    ```
-    *Note: Replace placeholder values with your actual database credentials and desired settings.*
-
-3.  **Build and Run with Docker Compose**:
-    Navigate to the root directory of the project (`tuyendungJd`) and execute:
-    ```bash
-    docker-compose up --build
-    ```
-    This command will:
-    *   Build the Docker images for both `backend` and `frontend-react`.
-    *   Start the containers, including any dependent services like a database (if configured in `docker-compose.yml`).
-    *   The backend will typically be accessible at `http://localhost:5000` (or your configured port).
-    *   The frontend will typically be accessible at `http://localhost:3000` (or its configured port).
-
-4.  **Access the Application**:
-    Once the containers are running, open your web browser and navigate to `http://localhost:3000` to access the `tuyendungJd` application.
-
----
-
-## Community & Governance
-
-We welcome contributions from the community to make `tuyendungJd` even better!
-
-### Contributing
-
-To contribute to `tuyendungJd`, please follow these guidelines:
-
-1.  **Fork the Repository**: Start by forking the `tuyendungJd` repository to your GitHub account.
-2.  **Create a New Branch**: Create a descriptive branch for your feature or bug fix (e.g., `feature/add-job-search`, `fix/login-bug`).
-    ```bash
-    git checkout -b feature/your-feature-name
-    ```
-3.  **Implement Your Changes**: Write clean, well-documented code following the project's coding standards.
-4.  **Test Your Changes**: Ensure your changes are thoroughly tested and do not introduce regressions.
-5.  **Commit Your Changes**: Commit your changes with clear, concise commit messages.
-    ```bash
-    git commit -m "feat: Add new job search functionality"
-    ```
-6.  **Push to Your Fork**: Push your branch to your forked repository.
-    ```bash
-    git push origin feature/your-feature-name
-    ```
-7.  **Open a Pull Request**: Submit a pull request from your branch to the `main` branch of the original `tuyendungJd` repository. Provide a detailed description of your changes and reference any relevant issues.
-
-### License
-
-This project is licensed under the **MIT License**.
-
-You are free to:
-
-*   **Use**: Use the software for any purpose, including commercial.
-*   **Modify**: Modify the software to suit your needs.
-*   **Distribute**: Distribute the software.
-*   **Sublicense**: Sublicense the software.
-
-Provided that the following conditions are met:
-
-*   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-For the full text of the license, please refer to the `LICENSE` file in the root of this repository.
+*This README was generated with ❤️ by [ReadmeBuddy](https://readmebuddy.com)*
